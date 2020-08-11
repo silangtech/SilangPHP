@@ -1,5 +1,5 @@
 {
-    "name": "phpsl/SilangPHP",
+    "name": "silangtech/SilangPHP",
     "description" : "一个简单易用的php框架",
     "type": "application",
     "keywords": ["SilangPHP","php framework"],

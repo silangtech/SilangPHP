@@ -1,0 +1,26 @@
+{
+    "name": "phpsl/SilangPHP",
+    "description" : "一个简单易用的php框架",
+    "type": "application",
+    "keywords": ["SilangPHP","php framework"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "shengsheng",
+            "email": "9448923@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^4.2"
+    },
+    "_comment": "SilangPHP",
+    "autoload": {
+        "psr-4": {
+            "SilangPHP\\": "src/",
+            "App\\": "App/"
+        }
+    }
+}

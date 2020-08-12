@@ -10,12 +10,77 @@
 | http://www.gnu.org/licenses/.                                         |
 | Copyright (C) 2020. All Rights Reserved.                              |
 +-----------------------------------------------------------------------+
-| Supports: http://www.github.com/phpsl/SilangPHP                       |
+| Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
 namespace SilangPHP;
 class Response
 {
+
+    public static $header = [];
+    public static $body = '';
+    // 状态码一般正确返回是200
+    public static $status = 200;
+    public static $httpCode = [
+        100 => 'Continue',
+        101 => 'Switching Protocols',
+        102 => 'Processing',
+        200 => 'OK',
+        201 => 'Created',
+        202 => 'Accepted',
+        203 => 'Non-Authoritative Information',
+        204 => 'No Content',
+        205 => 'Reset Content',
+        206 => 'Partial Content',
+        207 => 'Multi-Status',
+        208 => 'Already Reported',
+        226 => 'IM Used',
+        300 => 'Multiple Choices',
+        301 => 'Moved Permanently',
+        302 => 'Found',
+        303 => 'See Other',
+        304 => 'Not Modified',
+        305 => 'Use Proxy',
+        306 => '(Unused)',
+        307 => 'Temporary Redirect',
+        308 => 'Permanent Redirect',
+        400 => 'Bad Request',
+        401 => 'Unauthorized',
+        402 => 'Payment Required',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+        405 => 'Method Not Allowed',
+        406 => 'Not Acceptable',
+        407 => 'Proxy Authentication Required',
+        408 => 'Request Timeout',
+        409 => 'Conflict',
+        410 => 'Gone',
+        411 => 'Length Required',
+        412 => 'Precondition Failed',
+        413 => 'Payload Too Large',
+        414 => 'URI Too Long',
+        415 => 'Unsupported Media Type',
+        416 => 'Range Not Satisfiable',
+        417 => 'Expectation Failed',
+        422 => 'Unprocessable Entity',
+        423 => 'Locked',
+        424 => 'Failed Dependency',
+        426 => 'Upgrade Required',
+        428 => 'Precondition Required',
+        429 => 'Too Many Requests',
+        431 => 'Request Header Fields Too Large',
+        500 => 'Internal Server Error',
+        501 => 'Not Implemented',
+        502 => 'Bad Gateway',
+        503 => 'Service Unavailable',
+        504 => 'Gateway Timeout',
+        505 => 'HTTP Version Not Supported',
+        506 => 'Variant Also Negotiates',
+        507 => 'Insufficient Storage',
+        508 => 'Loop Detected',
+        510 => 'Not Extended',
+        511 => 'Network Authentication Required'
+    ];
     public static $connection = null;
     public static $hander = null;
     public static $cors = [];
@@ -34,7 +99,7 @@ class Response
             'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
             // 'Access-Control-Allow-Headers' => '*',
             // uc浏览器windows版如果Access-Control-Allow-Headers 使用 * 是有问题的
-            'Access-Control-Allow-Headers' => 'Accept,AUTHORIZATION,DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization',
+            'Access-Control-Allow-Headers' => 'Accept,AUTHORIZATION,DNT,X-Token,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization',
         ];
     }
 
@@ -64,29 +129,15 @@ class Response
     }
 
     /**
-     * 设置响应状态码
+     * toJson
      */
-    public static function code($type = "success")
+    public static function toJson($result,$param = '')
     {
-        $arr_type = [
-            'error' => 500,
-            //Unauthorized
-            'unauth' => 401,
-            //Forbidden
-            'forbidden' => 403,
-            //默认success
-            'success' => 200,
-            'notfound' => 404,
-        ];
-        if(!isset($arr_type[$type]))
-        {
-            $type = "success";
-        }
-        $code = $arr_type[$type];
-        http_response_code($code);
+        return json_encode($result);
     }
 
     /**
+     * headers
      * 输出json
      */
     public static function json($code=0,$msg='',$data='')
@@ -100,7 +151,8 @@ class Response
      */
     public static function end($result)
     {
-        echo $result;
+        // 输出header与body
+        return $result;
     }
 
     /**
@@ -108,21 +160,7 @@ class Response
      */
     public static function write($result)
     {
-        echo $result;
-    }
-    
-    /**
-     * 通用返回
-     */
-    public static function commonData($data,$page,$pageSize)
-    {
-        $rows['list'] = $data['list'];
-        $rows['pagination'] = [
-            'total' => (int)$data['total'],
-            'pageSize' => (int)$pageSize,
-            'current' => (int)$page,
-        ];
-        return $rows;
+        self::$body .= $result;
     }
 
     /**

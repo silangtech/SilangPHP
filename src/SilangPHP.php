@@ -10,12 +10,17 @@
 | http://www.gnu.org/licenses/.                                         |
 | Copyright (C) 2020. All Rights Reserved.                              |
 +-----------------------------------------------------------------------+
-| Supports: http://www.github.com/phpsl/SilangPHP                       |
+| Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP;
 
+// 统一中国时区
 date_default_timezone_set('Asia/Shanghai');
+// 核心地址
+define('DS',DIRECTORY_SEPARATOR);
+defined('CORE_PATH') or define('CORE_PATH', __DIR__);
 
 /**
  * Class SilangPHP
@@ -24,12 +29,84 @@ date_default_timezone_set('Asia/Shanghai');
 final Class SilangPHP
 {
     const VERSION = '1.0.0';
-    public $appDir;
-    public $ct;
-    public $ac;
-    public $pathInfo;
+    public static $appDir;
+    public static $config = [];
+    public static $ct;
+    public static $ac;
+    private static $startTime = '';
+    private static $endTime = '';
     // 内存里的缓存
     public $cache = [];
+
+    /**
+     * 初始化
+     */
+    public static function initialize()
+    {
+        $appName = basename(self::$appDir);
+        define("PS_APP_PATH",        self::$appDir);
+        define("PS_APP_NAME",       $appName);
+        define("PS_CONFIG_PATH",		PS_APP_PATH."/Config/");
+        define("PS_RUNTIME_PATH",		PS_ROOT_PATH."/Runtime/");
+        self::$config = Config::get("Site");
+        self::$ct = self::$config['defaultController'];
+        self::$ac = self::$config['defaultAction'];
+        if(PHP_SAPI == 'cli')
+        {
+            define("run_mode",2);
+            define("lr",PHP_EOL);
+        }else{
+            define("run_mode",1);
+            define("lr","<br/>");
+            // fpm模式下
+            if(self::$config['debug'] = '1' && self::$config['mode'] == 0)
+            {
+                $safe_ip = '';
+                if(self::$config['debug_ip'])
+                {
+                    $safe_ip = explode(",",self::$config['debug_ip']);
+                }
+                $debug = 1;
+                // 开启ip的情况
+                if($safe_ip)
+                {
+                    $ip = \SilangPHP\Util\Util::get_client_ip();
+                    if( (in_array($ip,$safe_ip)) )
+                    {
+                        $debug = 1;
+                    }else{
+                        $debug = 0;
+                    }
+                }
+                if($debug)
+                {
+                    error_reporting(E_ALL);
+                    Error::register();
+                }else{
+                    error_reporting(0);
+                }
+            }else{
+                error_reporting(0);
+            }
+        }
+    }
+
+    /**
+     * 获取临时缓存
+     */
+    public static function get($key)
+    {
+        return self::$cache[$key] ?? '';
+    }
+
+    /**
+     * 设置临时缓存
+     */
+    public static function set($key,$value)
+    {
+        self::$cache[$key] = $value;
+    }
+
     /**
      * 设置程序目录
      * @param $path
@@ -42,8 +119,23 @@ final Class SilangPHP
     /**
      * 运行程序
      */
-    public static function run()
+    public static function run($pathinfo = '')
     {
+        self::$startTime = microtime(true);
+        if(empty(self::$appDir))
+        {
+            return false;
+        }else{
+            self::initialize();
+        }
+        if(run_mode == '2')
+        {
+            Console::start();
+        }else{
+            $res = Route::start($pathinfo);
+        }
+        self::$endTime = microtime(true);
+        return Response::end($res);
 
     }
 }

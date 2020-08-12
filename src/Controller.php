@@ -10,14 +10,13 @@
 | http://www.gnu.org/licenses/.                                         |
 | Copyright (C) 2020. All Rights Reserved.                              |
 +-----------------------------------------------------------------------+
-| Supports: http://www.github.com/phpsl/SilangPHP                       |
+| Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
 namespace SilangPHP;
 
 class Controller
 {
-    //是否ajax请求
     public $is_ajax = false;
     //默认使用的页数
     public function __construct()
@@ -32,6 +31,16 @@ class Controller
     public function is_ajax()
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtoupper($_SERVER['HTTP_X_REQUESTED_WITH'])=='XMLHTTPREQUEST';
+    }
+
+    public function success($msg = '')
+    {
+        return Response::json(0,$msg);
+    }
+
+    public function fail($code = -1,$msg = '')
+    {
+        return Response::json($code);
     }
 
 }

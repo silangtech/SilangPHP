@@ -5,7 +5,7 @@
  */
 return [
     //框架里的模式 [0 fpm];
-    'type' => 0,
+    'mode' => 0,
     //绑定的主机地址
     'host' => '0.0.0.0',
     //启动的端口
@@ -19,4 +19,7 @@ return [
     'cookie_domain' => '',
     //调试模式
     'debug' => 1,
+    'debug_ip' => '119.129.115.225,172.20.0.1',
+    'defaultController' => 'index',
+    'defaultAction' => 'index',
 ];

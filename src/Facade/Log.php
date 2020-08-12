@@ -10,10 +10,11 @@
 | http://www.gnu.org/licenses/.                                         |
 | Copyright (C) 2020. All Rights Reserved.                              |
 +-----------------------------------------------------------------------+
-| Supports: http://www.github.com/phpsl/SilangPHP                       |
+| Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
 namespace SilangPHP\Facade;
+use SilangPHP\Facade;
 
 class Log extends Facade
 {

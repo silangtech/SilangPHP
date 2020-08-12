@@ -10,7 +10,7 @@
 | http://www.gnu.org/licenses/.                                         |
 | Copyright (C) 2020. All Rights Reserved.                              |
 +-----------------------------------------------------------------------+
-| Supports: http://www.github.com/phpsl/SilangPHP                       |
+| Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
 namespace SilangPHP;
@@ -41,7 +41,7 @@ class Log
             }
         }
         //记录日志地址
-        $this->setLogPath(PS_RUNTIME.'/log/');
+        $this->setLogPath(PS_RUNTIME_PATH.'/log/');
         //二级日志地址
         if(empty($default_dir))
         {

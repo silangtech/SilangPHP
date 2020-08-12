@@ -10,16 +10,26 @@
 | http://www.gnu.org/licenses/.                                         |
 | Copyright (C) 2020. All Rights Reserved.                              |
 +-----------------------------------------------------------------------+
-| Supports: http://www.github.com/phpsl/SilangPHP                       |
+| Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
 namespace SilangPHP;
 
 class Tpl
 {
-    public $instance = null;
     //数据集合
-    public static $tpl_result = array('test');
+    public static $tpl_result = ['phpshow'=>'SilangPHP'];
+
+    /**
+     * 模板文件
+     * @param $file_name
+     * @return string
+     */
+    public static function tpl_file($file_name)
+    {
+        $file =  self::include_file($file_name);
+        return $file;
+    }
 
     /**
      * 当前Action的赋值
@@ -37,7 +47,7 @@ class Tpl
      */
     public static function include_file($file_name)
     {
-        return PS_APP_PATH.'/view/'.$file_name.".php";
+        return PS_APP_PATH.'/View/'.$file_name.".php";
     }
 
     /**
@@ -46,12 +56,10 @@ class Tpl
      */
     public static function display($file_name = '')
     {
-        $result = self::$tpl_result;
         ob_start();
+        extract(self::$tpl_result);
         include self::include_file($file_name);
-        $res = ob_get_contents();
-        ob_end_clean();
-        response::end($res);
-
+        ob_flush();
+        self::$tpl_result = ['phpshow'=>'SilangPHP'];
     }
 }

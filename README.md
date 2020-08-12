@@ -5,7 +5,7 @@
 
 
 # 安装
-composer require "phpsl/SilangPHP:dev-master"
+composer require "silangtech/SilangPHP:dev-master"
 
 # 新建项目
 暂时没有脚手架支持创建项目文件，需手动新建

@@ -10,12 +10,23 @@
 | http://www.gnu.org/licenses/.                                         |
 | Copyright (C) 2020. All Rights Reserved.                              |
 +-----------------------------------------------------------------------+
-| Supports: http://www.github.com/phpsl/SilangPHP                       |
+| Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
 namespace SilangPHP;
 use SilangPHP\Traits\Instance;
 
 Class Console{
+    use Instance;
+    private $welcome = '
+  _________.__.__                       __________  ___ _____________ 
+ /   _____/|__|  | _____    ____    ____\______   \/   |   \______   \
+ \_____  \ |  |  | \__  \  /    \  / ___\|     ___/    ~    \     ___/
+ /        \|  |  |__/ __ \|   |  \/ /_/  >    |   \    Y    /    |    
+/_______  /|__|____(____  /___|  /\___  /|____|    \___|_  /|____|    
+        \/              \/     \//_____/                 \/           
+';
+
+
 
 }

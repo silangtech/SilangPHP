@@ -10,9 +10,10 @@
 | http://www.gnu.org/licenses/.                                         |
 | Copyright (C) 2020. All Rights Reserved.                              |
 +-----------------------------------------------------------------------+
-| Supports: http://www.github.com/phpsl/SilangPHP                       |
+| Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+namespace SilangPHP\Cache;
 class File
 {
     //缓存文件
@@ -20,7 +21,7 @@ class File
     
     //hash算法掩码0x7FFF = 32767，总数据量 ≈ $this->_mask_value * $this->_link_max / 2
     //private $_mask_value = 0x7FFF; 0x186A0
-    private $_mask_value = 0x5FFFF;
+    private $_mask_value = 32767; //0x5FFFF;
     
     //链表最大长度（当单个hash链表太长时，性能将比较差，直接清空这个链表）
     private $_link_max = 10000;
@@ -65,7 +66,7 @@ class File
     public function __construct( $cache_file='filecache_data', $is_single = false )
     {
         $this->_file_max = $this->_file_max * 1024 * 1024;
-        $this->_cache_file = $cache_file.'.php';
+        $this->_cache_file = PS_RUNTIME_PATH.'/'.$cache_file.'.php';
         if( !file_exists( $this->_cache_file ) )
         {
             $this->_create();
@@ -193,7 +194,7 @@ class File
     */ 
     public static function factory($cachefile='', $type='rb+')
     {
-       $qc = new cls_filecache( $cachefile );
+       $qc = new File( $cachefile );
        $qc->open();
        return $qc;
     }
@@ -208,7 +209,7 @@ class File
     private function _create( )
     {
         $this->_cache_fp = fopen($this->_cache_file, 'wb+');
-        @chmod($this->_cache_file, 0664);
+//        @chmod($this->_cache_file, 0664);
         flock($this->_cache_fp, LOCK_EX);
         fwrite($this->_cache_fp, $this->_exit_code);
         for($i=0; $i <= $this->_mask_value; $i++)

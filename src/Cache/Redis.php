@@ -10,7 +10,7 @@
 | http://www.gnu.org/licenses/.                                         |
 | Copyright (C) 2020. All Rights Reserved.                              |
 +-----------------------------------------------------------------------+
-| Supports: http://www.github.com/phpsl/SilangPHP                       |
+| Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
 namespace SilangPHP\Cache;
@@ -32,7 +32,7 @@ class Redis
     {
         $redis = new \Redis();
         //config文件夹读取 不连接会出现Redis server went away
-        $config = Config::get("db")['redis']['master'];
+        $config = Config::get("Db")['redis']['master'];
         $redis->connect($config['host'], $config['port']);
         if(!empty($config['auth']))
         {

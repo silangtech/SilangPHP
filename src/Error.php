@@ -10,7 +10,7 @@
 | http://www.gnu.org/licenses/.                                         |
 | Copyright (C) 2020. All Rights Reserved.                              |
 +-----------------------------------------------------------------------+
-| Supports: http://www.github.com/phpsl/SilangPHP                       |
+| Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
 namespace SilangPHP;
@@ -147,17 +147,12 @@ Class Error
             $nowtime = date('Y-m-d H:i:s');
             $err = "Time: ".$nowtime.' @URL: '.$nowurl."\n";
         }
-        if(run_mode == '2')
-        {
-            $err = "error:".$errno.", errmsg:".$errmsg.", filename:".$filename.", linenum:".$linenum.lr;
-            return $err;
-        }
         if( empty(self::$_debug_errortype[$errno]) )
         {
             self::$_debug_errortype[$errno] = "<font color='#466820'>手动抛出</font>";
         }
         $error_line = htmlspecialchars($error_line);
-        //$err .= "<strong>PHPSHOW框架应用错误跟踪：</strong><br />\n";
+        $err .= "<strong>SilangPHP框架应用错误跟踪：</strong><br />\n";
         $err .= "发生环境：" . date("Y-m-d H:i:s", time()).'::' . "<br />\n";
         $err .= "错误类型：" . self::$_debug_errortype[$errno] . "<br />\n";
         $err .= "出错原因：<font color='#3F7640'>" . $errmsg . "</font><br />\n";
@@ -179,7 +174,8 @@ Class Error
             $err .= "</font><br />\n";
         }
         $err .= $log_type=='debug' ? "</div>\n" : "------------------------------------------\n";
-        return $err;
+        echo $err;
+//        return $err;
     }
 
 
@@ -218,4 +214,23 @@ Class Error
             }
         }
     }
+
+    /**
+     * exception的处理
+     */
+    public static function fatal_handler()
+    {
+
+    }
+
+    public static function register()
+    {
+//        $whoops = new \Whoops\Run;
+//        $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+//        $whoops->register();
+        set_exception_handler(array('\SilangPHP\Error', 'handler_debug_exception'));
+        set_error_handler(array('\SilangPHP\Error', 'handler_debug_error'), E_ALL);
+        register_shutdown_function(array('\SilangPHP\Error', 'fatal_handler'));
+    }
+
 }

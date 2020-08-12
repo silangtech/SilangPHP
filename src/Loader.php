@@ -13,47 +13,27 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
-namespace SilangPHP\Exception;
-Class dbException extends \Exception
+namespace SilangPHP;
+/**
+ * autoloader
+ * Class Loader
+ * @package SilangPHP
+ */
+Class Loader
 {
-    private $errorCode;
-    private $sql;
-
     /**
-     * 初始化异常
+     * 注册autoload
      */
-    public function __construct($code = "", $message = "",  $sql = "")
+    public function register()
     {
-        parent::__construct($message, 0);
-        $this->errorCode = $code;
-        $this->sql = $sql;
+        spl_autoload_register(array($this, 'loadClass'));
     }
 
     /**
-     *  获取错误码
+     * 加载本框架文件
      */
-    public function getErrorCode()
+    public function loadClass()
     {
-        return $this->errorCode;
-    }
 
-    /**
-     * 获取错误的sql语句
-     */
-    public function getSql():string
-    {
-        return $this->sql;
     }
-
-    /**
-     * 格式化输出异常码，异常信息，请求id
-     * @return string
-     */
-    public function __toString()
-    {
-        return "[".__CLASS__."]"." code:".$this->errorCode.
-            " message:".$this->getMessage().
-            " sql:".$this->sql.lr;
-    }
-
 }

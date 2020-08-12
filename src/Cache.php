@@ -10,7 +10,7 @@
 | http://www.gnu.org/licenses/.                                         |
 | Copyright (C) 2020. All Rights Reserved.                              |
 +-----------------------------------------------------------------------+
-| Supports: http://www.github.com/phpsl/SilangPHP                       |
+| Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
 namespace SilangPHP;
@@ -40,34 +40,16 @@ Class Cache{
      * 构造函数
      * @return void
      */
-    public function __construct()
+    public function __construct($fileName = 'cachefile' ,$type = 'file', $cache_time='3600')
     {
-        if( !$GLOBALS['config']['cache']['enable'] ) {
-            return;
-        }
-        self::$df_prefix  = $GLOBALS['config']['cache']['df_prefix'];
-        self::$cache_time = $GLOBALS['config']['cache']['cache_time'];
-        self::$cache_type = $GLOBALS['config']['cache']['cache_type'];
+        self::$df_prefix  = PS_APP_NAME;
+        self::$cache_time = $cache_time;
+        self::$cache_type = $type;
         if( self::$cache_type == 'file' )
         {
-            $this->mc_handle = cls_filecache::factory( $GLOBALS['config']['cache']['file_cachename'] );
+            $this->mc_handle = \SilangPHP\Cache\File::factory( $fileName );
         }
-        else if( self::$cache_type == 'memcached' )
-        {
-            $this->mc_handle = new Memcached();
-            $servers = array();
-            foreach($GLOBALS['config']['cache']['memcache']['host'] as $k => $mcs) {
-                $mc_hosts = parse_url ( $mcs );
-                $servers[] = array($mc_hosts['host'], $mc_hosts['port']);
-            }
-            $this->mc_handle->addServers( $servers );
-        }
-        else
-        {
-            $this->mc_handle = new Memcache();
-            $mc_hosts = parse_url ( $GLOBALS['config']['cache']['memcache']['host'][0] );
-            $this->mc_handle->connect( $mc_hosts['host'], $mc_hosts['port'], $GLOBALS['config']['cache']['memcache']['time_out'] );
-        }
+        // todo 增加redis , memcached memcache放弃
     }
 
     /**
@@ -75,9 +57,6 @@ Class Cache{
      */
     protected static function _check_instance()
     {
-        if( !$GLOBALS['config']['cache']['enable'] ) {
-            return false;
-        }
         if( self::$instance == null ) {
             self::$instance = new cache();
         }

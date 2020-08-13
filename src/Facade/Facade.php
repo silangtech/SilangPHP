@@ -13,9 +13,14 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP;
 
-
+/**
+ * 这个类主要引用，平时不用知道它的存在
+ * Class Facade
+ * @package SilangPHP
+ */
 class Facade
 {
     public static $facade_obj = [];

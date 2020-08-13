@@ -13,9 +13,10 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP;
 use SilangPHP\Traits\Instance;
-Class config
+Class Config
 {
     use Instance;
     //框架配置文件
@@ -49,8 +50,6 @@ Class config
         }
 
     }
-
-
 
     /**
      * 获取配置
@@ -126,6 +125,16 @@ Class config
         }
         //只能生成在应用层config
         file_put_contents(PS_CONFIG_PATH.$config_name.".php",$data);
+    }
+
+    /**
+     * env文件加载
+     */
+    public static function env()
+    {
+        $envPath = PS_ROOT_PATH.'/.env';
+        $env = parse_ini_file($envPath,true);
+        return $env;
     }
 
 }

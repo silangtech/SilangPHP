@@ -13,12 +13,51 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP;
-
+use GuzzleHttp\Client;
 /**
+ * 基于guzzle请求网络
  * Class Http
  * @package SilangPHP
  */
 Class Http{
+    public static $timeout = 3;
 
+    /**
+     * http Get
+     * @param $url
+     * @param array $query
+     * @return string
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public static function get($url,$query = [])
+    {
+        $client = new Client();
+        $response = $client->get($url, [
+            'query' => $query,
+            'timeout' => self::$timeout
+        ]);
+        $body = $response->getBody();
+        $bodyStr = (string)$body;
+        return $bodyStr;
+    }
+
+    /**
+     * http Post
+     * @param $url
+     * @param $query
+     * @return string
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public static function post($url,$query)
+    {
+        $client = new Client();
+        $response = $client->post($url, [
+            'form_params' => $query
+        ]);
+        $body = $response->getBody();
+        $bodyStr = (string)$body;
+        return $bodyStr;
+    }
 }

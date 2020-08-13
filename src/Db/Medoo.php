@@ -7,13 +7,14 @@
  * Copyright 2018, Angel Lai
  * Released under the MIT license
  */
-
+declare(strict_types=1);
 namespace SilangPHP\Db;
 
 use PDO;
 use Exception;
 use PDOException;
 use InvalidArgumentException;
+use \SilangPHP\Exception\dbException;
 
 class Raw {
 	public $map;
@@ -318,7 +319,9 @@ class Medoo
 			}
 		}
 		catch (PDOException $e) {
-			throw new PDOException($e->getMessage());
+
+		    throw new dbException($e->getCode(),$e->getMessage(),"connect error!".$value);
+//			throw new PDOException($e->getMessage());
 		}
 	}
 
@@ -519,40 +522,42 @@ class Medoo
 			$columns = [$columns];
 		}
 
-		foreach ($columns as $key => $value)
-		{
-			if (is_array($value))
-			{
-				$stack[] = $this->columnPush($value, $map);
-			}
-			elseif (!is_int($key) && $raw = $this->buildRaw($value, $map))
-			{
-				preg_match('/(?<column>[a-zA-Z0-9_\.]+)(\s*\[(?<type>(String|Bool|Int|Number))\])?/i', $key, $match);
+		if($columns)
+        {
+            foreach ($columns as $key => $value)
+            {
+                if (is_array($value))
+                {
+                    $stack[] = $this->columnPush($value, $map);
+                }
+                elseif (!is_int($key) && $raw = $this->buildRaw($value, $map))
+                {
+                    preg_match('/(?<column>[a-zA-Z0-9_\.]+)(\s*\[(?<type>(String|Bool|Int|Number))\])?/i', $key, $match);
 
-				$stack[] = $raw . ' AS ' . $this->columnQuote( $match[ 'column' ] );
-			}
-			elseif (is_int($key) && is_string($value))
-			{
-				preg_match('/(?<column>[a-zA-Z0-9_\.]+)(?:\s*\((?<alias>[a-zA-Z0-9_]+)\))?(?:\s*\[(?<type>(?:String|Bool|Int|Number|Object|JSON))\])?/i', $value, $match);
+                    $stack[] = $raw . ' AS ' . $this->columnQuote( $match[ 'column' ] );
+                }
+                elseif (is_int($key) && is_string($value))
+                {
+                    preg_match('/(?<column>[a-zA-Z0-9_\.]+)(?:\s*\((?<alias>[a-zA-Z0-9_]+)\))?(?:\s*\[(?<type>(?:String|Bool|Int|Number|Object|JSON))\])?/i', $value, $match);
 
-				if (!empty($match[ 'alias' ]))
-				{
-					$stack[] = $this->columnQuote( $match[ 'column' ] ) . ' AS ' . $this->columnQuote( $match[ 'alias' ] );
+                    if (!empty($match[ 'alias' ]))
+                    {
+                        $stack[] = $this->columnQuote( $match[ 'column' ] ) . ' AS ' . $this->columnQuote( $match[ 'alias' ] );
 
-					$columns[ $key ] = $match[ 'alias' ];
+                        $columns[ $key ] = $match[ 'alias' ];
 
-					if (!empty($match[ 'type' ]))
-					{
-						$columns[ $key ] .= ' [' . $match[ 'type' ] . ']';
-					}
-				}
-				else
-				{
-					$stack[] = $this->columnQuote( $match[ 'column' ] );
-				}
-			}
-		}
-
+                        if (!empty($match[ 'type' ]))
+                        {
+                            $columns[ $key ] .= ' [' . $match[ 'type' ] . ']';
+                        }
+                    }
+                    else
+                    {
+                        $stack[] = $this->columnQuote( $match[ 'column' ] );
+                    }
+                }
+            }
+        }
 		return implode( ',',$stack);
 	}
 

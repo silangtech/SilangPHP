@@ -13,13 +13,16 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
-
+declare(strict_types=1);
 namespace SilangPHP\Db;
 
 use Exception;
 use \SilangPHP\Exception\dbException;
 use \SilangPHP\Config;
-class mysql
+use SilangPHP\Facade;
+use SilangPHP\SilangPHP;
+
+class Mysql
 {
     //数据库链接
     public $link;
@@ -46,8 +49,7 @@ class mysql
         }else{
             $charset = $config['charset'];
         }
-        $dsn    = 'mysql:dbname=' . $config['dbname'] . ';host=' .
-            $config["host"] . ';port=' . $config['port'];
+        $dsn    = 'mysql:dbname=' . $config['dbname'] . ';host=' . $config["host"] . ';port=' . $config['port'];
         $this->pdo = new \PDO($dsn, $config['username'], $config["password"],
             array(
                 \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . $charset
@@ -78,7 +80,7 @@ class mysql
             $lasttime = $endtime - $starttime;
             if (!$result) {
                 //调试模式才能显示 查看语句的时效
-                if(Config::get('site.debug') == 1)
+                if(SilangPHP::$debug == 1)
                 {
                     echo $sql.lr;
                     echo "sql_time:".$lasttime.lr;
@@ -87,9 +89,9 @@ class mysql
             return $result;
         }catch(dbException $e)
         {
-            if(Config::get('site.debug') == 1)
+            if(SilangPHP::$debug == 1)
             {
-                echo $e;
+                Facade\Log::alert($e->getSql());
                 // echo $e->getSql();
             }
         }

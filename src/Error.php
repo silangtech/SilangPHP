@@ -13,6 +13,7 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP;
 Class Error
 {
@@ -220,6 +221,16 @@ Class Error
      */
     public static function fatal_handler()
     {
+        if(SilangPHP::$endTime == '')
+        {
+            SilangPHP::$endTime = microtime(true);
+        }
+        $caltime = SilangPHP::$endTime - SilangPHP::$startTime;
+        // 非ajax请求可输出
+        if(SilangPHP::$debug == 1)
+        {
+//            echo $caltime;
+        }
 
     }
 

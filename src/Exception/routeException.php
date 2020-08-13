@@ -14,34 +14,13 @@
 +-----------------------------------------------------------------------+
 */
 declare(strict_types=1);
-namespace SilangPHP;
-
-class Controller
+namespace SilangPHP\Exception;
+/**
+ * 路由异常
+ * Class routeException
+ * @package SilangPHP\Exception
+ */
+Class routeException extends \PDOException
 {
-    public $is_ajax = false;
-    //默认使用的页数
-    public function __construct()
-    {
-        $this->is_ajax = $this->is_ajax();
-    }
-
-    /**
-     * 判断是否ajax请求
-     * @return bool
-     */
-    public function is_ajax()
-    {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtoupper($_SERVER['HTTP_X_REQUESTED_WITH'])=='XMLHTTPREQUEST';
-    }
-
-    public function success($msg = '')
-    {
-        return Response::json(0,$msg);
-    }
-
-    public function fail($code = -1,$msg = '')
-    {
-        return Response::json($code);
-    }
 
 }

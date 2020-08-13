@@ -13,8 +13,9 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP\Facade;
-use SilangPHP\Facade;
+use SilangPHP\Facade\Facade;
 
 class Log extends Facade
 {

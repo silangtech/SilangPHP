@@ -13,6 +13,7 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP;
 use SilangPHP\Traits\Instance;
 class Di

@@ -13,6 +13,7 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP;
 class Request
 {
@@ -47,6 +48,7 @@ class Request
             $this->gets = $_GET ?? [];
             $this->server = $_SERVER ?? [];
             $this->cookies = $_COOKIE ?? [];
+            $this->request = $_REQUEST ?? [];
         }
         // 跑取获得的header
         foreach ($_SERVER as $key => $val) {
@@ -105,6 +107,7 @@ class Request
 
     /**
      * 获得raw
+     * postjson
      */
     public function getRaw()
     {
@@ -113,6 +116,15 @@ class Request
             return file_get_contents("php://input");
         }
         return '';
+    }
+
+    /**
+     * Alias getRaw
+     * @return false|string
+     */
+    public function postjson()
+    {
+        return $this->getRaw();
     }
 
     /**

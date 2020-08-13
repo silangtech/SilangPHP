@@ -13,8 +13,14 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP\Exception;
-Class dbException extends \Exception
+/**
+ * 数据库异常
+ * Class dbException
+ * @package SilangPHP\Exception
+ */
+Class dbException extends \PDOException
 {
     private $errorCode;
     private $sql;
@@ -24,7 +30,7 @@ Class dbException extends \Exception
      */
     public function __construct($code = "", $message = "",  $sql = "")
     {
-        parent::__construct($message, 0);
+        parent::__construct($message, $code);
         $this->errorCode = $code;
         $this->sql = $sql;
     }

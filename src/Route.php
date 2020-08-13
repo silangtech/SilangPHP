@@ -13,12 +13,12 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP;
 use SilangPHP\Facade\Log;
 class Route
 {
-    public static $rules = array();
-    protected static $is_load = false;
+    public static $rules = [];
     public static $path_array = [];
 
     /**
@@ -29,6 +29,7 @@ class Route
      */
     public static function start($pathInfo = '')
     {
+        self::load_rule();
         if(!empty($pathInfo)){
             $path= $pathInfo;
         }elseif(!empty($_SERVER['PATH_INFO'])){
@@ -36,14 +37,20 @@ class Route
         }elseif(!empty($_SERVER['REQUEST_URI'])){
             $path= $_SERVER["REQUEST_URI"];
         }
+        // 未必要从$_SERVER里获取
+        $method = $_SERVER['REQUEST_METHOD'];
+        $path = trim($path,"/");
+        if(isset(self::$rules[$path.'_'.$method]))
+        {
+            $path = self::$rules[$path.'_'.$method];
+        }else{
+            // 不存在可以跳404
+        }
         // 默认加载的类
         if(empty($path) || $path === '/')
         {
-            $ct = SilangPHP::$ct;
-            $ac = SilangPHP::$ac;
             $path =  SilangPHP::$ct."/".SilangPHP::$ac;
         }
-
         self::$path_array = preg_split("/[\/]/",$path,-1,PREG_SPLIT_NO_EMPTY);
         $controller = self::$path_array[0];
         $action = self::$path_array[1];
@@ -69,7 +76,6 @@ class Route
                 throw new \Exception("Controller $cls not found!");
             }
             $ins = new $cls();
-
             $found = false;
             if(method_exists($ins, $action)){
                 $ins->action = $action;
@@ -101,74 +107,41 @@ class Route
         return false;
     }
 
-
     /**
      * 加载 rewrite rule 文件
+     * @todo 天上则的支持
      */
     protected static function load_rule()
     {
-        self::$is_load = true;
-        $rulefile = PS_CONFIG_PATH.'/rewrite.ini';
-        if( file_exists($rulefile) )
+        if(!empty(self::$rules))
         {
-            $ds = file($rulefile);
-            foreach($ds as $line)
+            return self::$rules;
+        }
+        $Rule = Config::get('Route');
+        if($Rule)
+        {
+            foreach($Rule as $key=>$val)
             {
-                $line = trim($line);
-                if( $line=='' || $line[0]=='#')
+                if($val['0'] == 'rest' && !empty($val['1']))
+                {
+                    // rest模式
+                    $Rule[$val['1'].'_GET'] = 'get';
+                    $Rule[$val['1'].'_POST'] = 'post';
+                    $Rule[$val['1'].'_PUT'] = 'put';
+                    $Rule[$val['1'].'_delete'] = 'delete';
+                    $Rule[$val['1'].'_patch'] = 'patch';
+                    $Rule[$val['1'].'_head'] = 'head';
+                    $Rule[$val['1'].'_options'] = 'options';
+                }
+                if(!isset($val['0']) || !isset($val['1']) || !isset($val['2']) )
                 {
                     continue;
                 }
-                list($s, $t) = preg_split('/[ ]{4,}/', $line); //用至少四个空格分隔，这样即使s、t中有空格也能识别
-                $s = rtrim($s);
-                $t = ltrim($t);
-                if( $s != '' && $t !='' )
-                {
-                    $_s = preg_replace("#(^[\^]|[\$]$)#", '', $s);
-                    $sok = $s[0]=='^' ? '<rw>'.$_s : '<rw>(.*)'.$_s;
-                    $s = $s[strlen($s)-1]=='$' ? $sok.'</rw>' : $sok.'([^<]*)</rw>';
-                    $s = preg_replace("#(^[\^]|[\$]$)#", '', $s);
-                    //$s = '<rw>'.$_s.'</rw>';
-                    self::$rules[ $s ] = $t;
-                }
+                $val['0'] = strtoupper($val['0']);
+                $Rule[$val['1'].'_'.$val['0']] = $val['2'];
             }
+            self::$rules = $Rule;
         }
     }
 
-    /**
-     * 转换要输出的内容里的网址
-     * @parem string $html
-     */
-    public static function convert_html(&$html)
-    {
-        if( !self::$is_load ) {
-            self::load_rule();
-        }
-        //echo '<xmp>';
-        foreach(self::$rules as $s => $t) {
-            //echo "$s -- $t \n";
-            $html = preg_replace('~'.$s.'~iU', $t, $html);
-        }
-        //exit();
-        $html = preg_replace('#<[/]{0,1}rw>#', '', $html);
-        return $html;
-    }
-
-    /**
-     * 转换单个网址
-     * @parem string $url
-     */
-    public static function convert_url($url)
-    {
-        if( !self::$is_load )
-        {
-            self::load_rule();
-        }
-        foreach(self::$rules as $s=>$t)
-        {
-            $url = preg_replace('/'.$s.'/iU', $t, $url);
-        }
-        return $url;
-    }
-    
 }

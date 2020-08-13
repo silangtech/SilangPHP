@@ -13,12 +13,13 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
-
+declare(strict_types=1);
 namespace SilangPHP;
 
 use SilangPHP\Db\Medoo;
+use SilangPHP\Exception\dbException;
 
-class Model extends Medoo implements ArrayAccess, JsonSerializable
+class Model extends Medoo implements \ArrayAccess, \JsonSerializable
 {
     //表格名
     public $table_name = "";
@@ -36,30 +37,55 @@ class Model extends Medoo implements ArrayAccess, JsonSerializable
     public $db_type = 'mysql';
     //查询字段
     public $fields = '*';
-    //条件
-    public $condition = '';
-    //order条件
-    public $condition_order = '';
-    //sql limit
-    public $condition_limit = '';
     //表格数据
     public $attr;
 
     public function __construct()
     {
-        //自动效验表格名
-        $this->table();
-        $config = \SilangPHP\Config::get("Db.mysql")[$this->database];
-        $options = [
-            'database_type' => $this->db_type,  //'mysql',
-            'database_name' => !empty($this->db_name)?$this->db_name:$config['dbname'],
-            'server' => $config['host'],
-            'username' => $config['username'],
-            'password' => $config['password'],
-            'charset' => 'utf8',
-            'port' => $config['port'],
-        ];
-        parent::__construct($options);
+        try{
+            //自动效验表格名
+            $this->table();
+            $config = \SilangPHP\Config::get("Db.mysql")[$this->database];
+            $options = [
+                'database_type' => $this->db_type,  //'mysql',
+                'database_name' => !empty($this->db_name)?$this->db_name:$config['dbname'],
+                'server' => $config['host'],
+                'username' => $config['username'],
+                'password' => $config['password'],
+                'charset' => 'utf8',
+                'port' => $config['port'],
+            ];
+            parent::__construct($options);
+        }catch(dbException $e)
+        {
+            Facade\Log::alert("数据库链接失败".$e->getSql());
+//            echo $e->getSql();
+        }
+    }
+
+    public function offsetExists($offset)
+    {
+
+    }
+
+    public function offsetGet($offset)
+    {
+
+    }
+
+    public function offsetSet($offset, $value)
+    {
+
+    }
+
+    public function offsetUnset($offset)
+    {
+
+    }
+
+    public function jsonSerialize()
+    {
+
     }
 
     public function create()
@@ -149,22 +175,19 @@ class Model extends Medoo implements ArrayAccess, JsonSerializable
      */
     public function insert1($attrs = '')
     {
-
         if(empty($attrs) && !empty($this->attr) )
         {
             $attrs = $this->attr;
         }
         parent::insert($this->table_name,$attrs);
-        
         if($this->error()['0'] != '00000')
         {
-            // var_dump($this->error());
+            Facade\Log::alert(json_encode($this->error()));
             //debug下打印一下
             return false;
         }else{
             $insert_id = $this->id();
         }
-
         return $insert_id;
     }
 
@@ -191,7 +214,7 @@ class Model extends Medoo implements ArrayAccess, JsonSerializable
      * 解释排序字段
      * game_id|ascend  字段|升降  ascend descend
      */
-    public function orderfield($sort_field = '')
+    public function orderField($sort_field = '')
     {
         $sort_field = explode("_",$sort_field);
         if(empty($sort_field) || !isset($sort_field['1']))

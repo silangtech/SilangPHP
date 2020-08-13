@@ -13,11 +13,12 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP;
 
 class Log
 {
-    //默认使用seaslog作为写入日志 [2 seaslog |1 file_put_contents]
+    //默认使用seaslog作为写入日志 [2 seaslog |1 file_put_contents error_log]
     public $type = 2;
     //日志类型
     public $log_type = array("debug"=>1,"info"=>2,"notice"=>3,"error"=>4,"critical"=>5,"emergency"=>6,"alert"=>7);
@@ -160,6 +161,7 @@ class Log
 
     /**
      * 设置日志规则
+     * @todo 每次设置都要return一个新的对象factory
      * @param string $name
      * @return string
      */

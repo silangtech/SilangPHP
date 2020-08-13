@@ -13,6 +13,7 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP;
 Class Cache{
     //缓存记录内存变量
@@ -48,8 +49,11 @@ Class Cache{
         if( self::$cache_type == 'file' )
         {
             $this->mc_handle = \SilangPHP\Cache\File::factory( $fileName );
+        }elseif ( self::$cache_type == 'redis' )
+        {
+            $this->mc_handle = new \SilangPHP\Cache\Redis();
         }
-        // todo 增加redis , memcached memcache放弃
+        // 这就不增加redis了
     }
 
     /**
@@ -93,12 +97,7 @@ Class Cache{
         if( self::$need_mem ) {
             self::$instance->mc_handle->caches[ $key ] = $value;
         }
-        //修正memcached不支持压缩选项
-        if( self::$cache_type == 'memcached' ) {
-            return self::$instance->mc_handle->set($key, $value, $cachetime);
-        } else {
-            return self::$instance->mc_handle->set($key, $value, 0, $cachetime);
-        }
+        return self::$instance->mc_handle->set($key, $value, $cachetime);
     }
 
     /**
@@ -165,22 +164,5 @@ Class Cache{
         if( self::$cache_type != 'memcached' ) {
             self::$instance->mc_handle->close();
         }
-    }
-
-    /**
-     * 重设cache参数(使用其它缓存文件)
-     * @return void
-     */
-    public static function reconfig( $config )
-    {
-        $GLOBALS['config']['cache'] = $config;
-        if( self::$instance != null )
-        {
-            if( self::$cache_type != 'memcached' ) {
-                self::$instance->mc_handle->close();
-            }
-            self::$instance = null;
-        }
-        return self::_check_instance();
     }
 }

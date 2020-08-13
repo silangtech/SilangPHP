@@ -12,7 +12,8 @@
     ],
     "require": {
         "php": ">=7.1.0",
-        "guzzlehttp/guzzle": "*"
+        "guzzlehttp/guzzle": "*",
+        "symfony/console": "*"
     },
     "require-dev": {
         "symfony/var-dumper": "^4.2"

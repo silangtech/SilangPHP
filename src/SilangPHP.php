@@ -29,12 +29,16 @@ defined('CORE_PATH') or define('CORE_PATH', __DIR__);
 final Class SilangPHP
 {
     const VERSION = '1.0.0';
-    public static $appDir;
+    protected static $appDir;
     public static $config = [];
-    public static $ct;
-    public static $ac;
-    private static $startTime = '';
-    private static $endTime = '';
+    public static $ct = 'index';
+    public static $ac = 'index';
+    public static $mode = 0;
+    public static $debug = 1;
+    public static $debug_ip = '';
+    public static $cookie_domain = '';
+    public static $startTime = '';
+    public static $endTime = '';
     // 内存里的缓存
     public $cache = [];
 
@@ -49,8 +53,13 @@ final Class SilangPHP
         define("PS_CONFIG_PATH",		PS_APP_PATH."/Config/");
         define("PS_RUNTIME_PATH",		PS_ROOT_PATH."/Runtime/");
         self::$config = Config::get("Site");
-        self::$ct = self::$config['defaultController'];
-        self::$ac = self::$config['defaultAction'];
+        if(self::$config)
+        {
+            self::$ct = self::$config['defaultController'];
+            self::$ac = self::$config['defaultAction'];
+            self::$debug_ip = self::$config['debug_ip'];
+            self::$cookie_domain = self::$config['cookie_domain'];
+        }
         if(PHP_SAPI == 'cli')
         {
             define("run_mode",2);
@@ -59,12 +68,12 @@ final Class SilangPHP
             define("run_mode",1);
             define("lr","<br/>");
             // fpm模式下
-            if(self::$config['debug'] = '1' && self::$config['mode'] == 0)
+            if(self::$debug = '1' && self::$mode == 0)
             {
                 $safe_ip = '';
-                if(self::$config['debug_ip'])
+                if(self::$debug_ip)
                 {
-                    $safe_ip = explode(",",self::$config['debug_ip']);
+                    $safe_ip = explode(",",self::$debug_ip);
                 }
                 $debug = 1;
                 // 开启ip的情况
@@ -129,6 +138,14 @@ final Class SilangPHP
             self::initialize();
         }
         if(run_mode == '2')
+        {
+            $cli = 1;
+            if(self::$config['mode'] != 0)
+            {
+                $cli = 0;
+            }
+        }
+        if($cli == 1)
         {
             Console::start();
         }else{

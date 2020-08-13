@@ -4,6 +4,6 @@
  */
 
 return [
-    'get.Index' => 'index/index',
-    'post.Index' => 'index/post',
+    ['GET','index.test','index/index'],
+    ['POST','index.oklala','index/index2'],
 ];

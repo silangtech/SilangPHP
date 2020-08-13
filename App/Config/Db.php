@@ -7,7 +7,7 @@ return [
     'mysql' => [
         //相当于default
         'master' => [
-            'host' => '172.20.0.7',
+            'host' => '172.20.0.77',
             'port' => '3306',
             'dbname' => 'phpshow',
             'username' => 'root',

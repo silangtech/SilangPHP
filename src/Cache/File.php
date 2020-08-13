@@ -13,6 +13,7 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP\Cache;
 class File
 {
@@ -357,7 +358,6 @@ class File
      *
      * @param $key
      * @param $value
-     * @parem $compress 是否压缩（无用选项，这里仅是为了和memcache方法一致）
      * @parem $exptime 超时时间
      * @parem $block_size (这版本弃用了此值)
      *        块大小，如果这个key的数据要经常更新， 把这个值设置比实际数据大一些， 这样在在重复set时， 就不会占用新的空间，
@@ -365,7 +365,7 @@ class File
      * @return void
      *
      */
-    public function set( $key, $value, $compress=0, $exptime=0, $block_size=1 )
+    public function set( $key, $value, $exptime=0, $block_size=1 )
     {
         if( $key=='' ) {
             return false;

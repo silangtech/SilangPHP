@@ -14,7 +14,7 @@
 +-----------------------------------------------------------------------+
 */
 declare(strict_types=1);
-namespace SilangPHP;
+namespace SilangPHP\Facade;
 
 /**
  * 这个类主要引用，平时不用知道它的存在

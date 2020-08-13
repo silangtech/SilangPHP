@@ -25,16 +25,51 @@ Class Loader
     /**
      * 注册autoload
      */
-    public function register()
+    public static function register()
     {
-        spl_autoload_register(array($this, 'loadClass'));
+        spl_autoload_register(array(Loader::class, 'loadByNamespace'));
     }
 
     /**
-     * 加载本框架文件
+     * Load files by namespace.
+     *
+     * @param string $name
+     * @return boolean
      */
-    public function loadClass()
+    public static function loadByNamespace($name)
     {
+        $_autoloadRootPath = __DIR__;
+        $class_path = \str_replace('\\', \DIRECTORY_SEPARATOR, $name);
+        if (\strpos($name, 'SilangPHP\\') === 0) {
+            $class_file = __DIR__ . \substr($class_path, \strlen('SilangPHP')) . '.php';
+        } else {
+            if ($_autoloadRootPath) {
+                $class_file = $_autoloadRootPath . \DIRECTORY_SEPARATOR . $class_path . '.php';
+            }
+            if (empty($class_file) || !\is_file($class_file)) {
+                $class_file = __DIR__ . \DIRECTORY_SEPARATOR . '..' . \DIRECTORY_SEPARATOR . "$class_path.php";
+            }
+        }
+        if (\is_file($class_file)) {
+            require_once($class_file);
+            if (\class_exists($name, false)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    /**
+     * 框架类的映射
+     */
+    public static function map()
+    {
+        $map = [
+            'SilangPHP\\SilangPHP' => 'SilangPHP.php',
+            'SilangPHP\\Cache' => 'Cache.php',
+            'SilangPHP\\Config' => 'Config.php',
+            'SilangPHP\\Di' => 'Di.php',
+        ];
+        return $map;
     }
 }

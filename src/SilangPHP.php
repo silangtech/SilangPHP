@@ -137,6 +137,7 @@ final Class SilangPHP
         }else{
             self::initialize();
         }
+        $cli = 0;
         if(run_mode == '2')
         {
             $cli = 1;

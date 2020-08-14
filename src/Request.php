@@ -17,16 +17,16 @@ declare(strict_types=1);
 namespace SilangPHP;
 class Request
 {
-    //用户的cookie
+    // 用户的cookie
     public $cookies = [];
 
-    //把GET、POST的变量合并一块，相当于 _REQUEST
+    // 把GET、POST的变量合并一块，相当于 _REQUEST 表单提交
     public $forms = [];
 
-    //_GET 变量
+    // _GET 变量
     public $gets = [];
 
-    //_POST 变量
+    // _POST 变量
     public $posts = [];
 
     public $header = [];
@@ -41,8 +41,7 @@ class Request
 
     public function __construct()
     {
-        $this->mode = SilangPHP::$config['mode'];
-        if($this->mode = 0)
+        if(SilangPHP::$mode == 0)
         {
             $this->posts = $_POST ?? [];
             $this->gets = $_GET ?? [];
@@ -73,8 +72,8 @@ class Request
      */
     public function get( $formname, $defaultvalue = '', $filter_type='' )
     {
-        if( isset( self::$gets[$formname] ) ) {
-            return self::$gets[$formname];
+        if( isset( $this->gets[$formname] ) ) {
+            return $this->filter( $this->gets[$formname], $filter_type );
         } else {
             return $defaultvalue;
         }
@@ -85,8 +84,8 @@ class Request
      */
     public function post( $formname, $defaultvalue = '', $filter_type='' )
     {
-        if( isset( self::$posts[$formname] ) ) {
-            return self::$posts[$formname];
+        if( isset( $this->posts[$formname] ) ) {
+            return $this->filter( $this->posts[$formname], $filter_type );
         } else {
             return $defaultvalue;
         }
@@ -97,8 +96,8 @@ class Request
      */
     public function cookie( $key, $defaultvalue = '', $filter_type='' )
     {
-        if( isset( self::$cookies[$key] ) ) {
-            return self::$cookies[$key];
+        if( isset( $this->cookies[$key] ) ) {
+            return $this->filter( $this->cookies[$key], $filter_type);
         } else {
             $value = $defaultvalue;
         }
@@ -136,13 +135,39 @@ class Request
      */
     public function item($formname, $defaultvalue = '', $filter_type='')
     {
-        if( isset( self::$posts[$formname] ) ) {
-            return self::$posts[$formname];
-        }elseif( isset( self::$gets[$formname] ) ) {
-            return self::$gets[$formname];
+        if( isset( $this->posts[$formname] ) ) {
+            return $this->filter($this->posts[$formname], $filter_type);
+        }elseif( isset( $this->gets[$formname] ) ) {
+            return $this->filter( $this->gets[$formname], $filter_type);
         }else{
             $value = $defaultvalue;
         }
         return $value;
     }
+
+    /**
+     * 强制转换类型
+     * @param $value
+     * @param string $type
+     */
+    public function filter($value,$type = '')
+    {
+        switch($type)
+        {
+            case 'int':
+                $value = intval($value);
+                break;
+            case 'float':
+                $value = floatval( $value );
+                break;
+            case 'array':
+                $value = (array)$value;
+                break;
+            default:
+                break;
+        }
+        return $value;
+    }
+
+
 }

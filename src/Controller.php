@@ -16,13 +16,17 @@
 declare(strict_types=1);
 namespace SilangPHP;
 
-class Controller
+abstract class Controller
 {
     public $is_ajax = false;
+    public $request;
+    public $response;
     //默认使用的页数
     public function __construct()
     {
         $this->is_ajax = $this->is_ajax();
+        $this->request = Di::instance()->get(\SilangPHP\Request::class);
+        $this->response = Di::instance()->get(\SilangPHP\Response::class);
     }
 
     /**

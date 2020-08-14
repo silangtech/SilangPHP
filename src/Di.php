@@ -25,7 +25,7 @@ class Di
      * @param $abstract
      * @param $concrete
      */
-    public function set(String $abstract,Closure $concrete){
+    public function set(String $abstract,$concrete){
         self::$container[$abstract] = $concrete;
     }
 
@@ -50,7 +50,7 @@ class Di
         {
             if(class_exists($abstract)) {
                 $tmp =  new $abstract(...$parameters);
-                self::$container = $tmp;
+                self::$container[$abstract] = $tmp;
                 return $tmp;
             } else {
                 return '';

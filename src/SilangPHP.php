@@ -50,7 +50,7 @@ final Class SilangPHP
         $appName = basename(self::$appDir);
         define("PS_APP_PATH",        self::$appDir);
         define("PS_APP_NAME",       $appName);
-        define("PS_CONFIG_PATH",		PS_APP_PATH."/Config/");
+        define("PS_CONFIG_PATH",		PS_ROOT_PATH."/Config/");
         define("PS_RUNTIME_PATH",		PS_ROOT_PATH."/Runtime/");
         self::$config = Config::get("Site");
         if(self::$config)
@@ -140,12 +140,15 @@ final Class SilangPHP
         $cli = 0;
         if(run_mode == '2')
         {
-            $cli = 1;
-            if(self::$config['mode'] != 0)
+            if(self::$mode != 0)
             {
                 $cli = 0;
+            }else{
+                $cli = 1;
             }
         }
+        Di::instance()->set(Request::class,new \SilangPHP\Request());
+        Di::instance()->set(Response::class,new \SilangPHP\Response());
         if($cli == 1)
         {
             Console::start();

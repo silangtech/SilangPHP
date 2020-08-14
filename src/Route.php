@@ -40,20 +40,22 @@ class Route
         // 未必要从$_SERVER里获取
         $method = $_SERVER['REQUEST_METHOD'];
         $path = trim($path,"/");
+        $path = parse_url($path,PHP_URL_PATH);
         if(isset(self::$rules[$path.'_'.$method]))
         {
             $path = self::$rules[$path.'_'.$method];
         }else{
-            // 不存在可以跳404
+            // 开启某种模式跳404
         }
         // 默认加载的类
-        if(empty($path) || $path === '/')
+        if(empty($path) || $path === '/' || $path === 'index.php')
         {
             $path =  SilangPHP::$ct."/".SilangPHP::$ac;
         }
         self::$path_array = preg_split("/[\/]/",$path,-1,PREG_SPLIT_NO_EMPTY);
         $controller = self::$path_array[0];
         $action = self::$path_array[1];
+        unset(self::$path_array[0],self::$path_array[1]);
         return self::load_controller($controller,$action);
     }
 
@@ -128,10 +130,10 @@ class Route
                     $Rule[$val['1'].'_GET'] = 'get';
                     $Rule[$val['1'].'_POST'] = 'post';
                     $Rule[$val['1'].'_PUT'] = 'put';
-                    $Rule[$val['1'].'_delete'] = 'delete';
-                    $Rule[$val['1'].'_patch'] = 'patch';
-                    $Rule[$val['1'].'_head'] = 'head';
-                    $Rule[$val['1'].'_options'] = 'options';
+                    $Rule[$val['1'].'_DELETE'] = 'delete';
+                    $Rule[$val['1'].'_PATCH'] = 'patch';
+                    $Rule[$val['1'].'_HEAD'] = 'head';
+                    $Rule[$val['1'].'_OPTIONS'] = 'options';
                 }
                 if(!isset($val['0']) || !isset($val['1']) || !isset($val['2']) )
                 {

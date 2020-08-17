@@ -13,5 +13,5 @@ composer create-project "silangtech/silangweb:dev-master" web
 
 # 在线文档
 详细规则与说明请查看文档
-https://silangphp.anyway.cn
+https://www.yuque.com/shengsheng-mpqqq/silangphp
 

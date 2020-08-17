@@ -104,7 +104,19 @@ class Route
             if($found){
                 Log::info("Controller: $file");
             }
-            return call_user_func_array(array($ins, $action), $argsParam );
+            // todo 后续改成event驱动
+            if(method_exists($ins,'beforeAction'))
+            {
+                call_user_func_array(array($ins, 'beforeAction'), []);
+            }
+            if(method_exists($ins,'afterAction'))
+            {
+                $tmp = call_user_func_array(array($ins, $action), $argsParam );
+                call_user_func_array(array($ins, 'afterAction'), []);
+                return $tmp;
+            }else{
+                return call_user_func_array(array($ins, $action), $argsParam );
+            }
         }
         return false;
     }

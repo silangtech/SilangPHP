@@ -117,7 +117,7 @@ class Response
     /**
      * 输出结尾
      */
-    public static function end($result = '')
+    public function end($result = '')
     {
         // 输出header与body
         return $result;

@@ -40,7 +40,9 @@ final Class SilangPHP
     public static $startTime = '';
     public static $endTime = '';
     // 内存里的缓存
-    public $cache = [];
+    public static $cache = [];
+    public static $request;
+    public static $response;
 
     /**
      * 初始化
@@ -126,6 +128,17 @@ final Class SilangPHP
     }
 
     /**
+     * 更新双R
+     */
+    public static function updateR()
+    {
+        self::$request = new \SilangPHP\Request();
+        self::$response = new \SilangPHP\Response();
+        Di::instance()->set(Request::class,self::$request);
+        Di::instance()->set(Response::class,self::$response);
+    }
+
+    /**
      * 运行程序
      */
     public static function run($pathinfo = '')
@@ -147,8 +160,7 @@ final Class SilangPHP
                 $cli = 1;
             }
         }
-        Di::instance()->set(Request::class,new \SilangPHP\Request());
-        Di::instance()->set(Response::class,new \SilangPHP\Response());
+        self::updateR();
         if($cli == 1)
         {
             Console::start();
@@ -156,7 +168,7 @@ final Class SilangPHP
             $res = Route::start($pathinfo);
         }
         self::$endTime = microtime(true);
-        return Response::end($res);
+        return self::$response->end($res);
 
     }
 }

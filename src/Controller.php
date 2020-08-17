@@ -30,6 +30,22 @@ abstract class Controller
     }
 
     /**
+     * 同个控制器，开始的时候调用
+     */
+    public function beforeAction()
+    {
+        return true;
+    }
+
+    /**
+     * 同个控制器,end的时候调用
+     */
+    public function afterAction()
+    {
+        return true;
+    }
+
+    /**
      * 判断是否ajax请求
      * @return bool
      */

@@ -39,6 +39,7 @@ final Class SilangPHP
     public static $cookie_domain = '';
     public static $startTime = '';
     public static $endTime = '';
+    public static $cacheType = 'file';
     // 内存里的缓存
     public static $cache = [];
     public static $request;
@@ -57,10 +58,11 @@ final Class SilangPHP
         self::$config = Config::get("Site");
         if(self::$config)
         {
-            self::$ct = self::$config['defaultController'];
-            self::$ac = self::$config['defaultAction'];
-            self::$debug_ip = self::$config['debug_ip'];
-            self::$cookie_domain = self::$config['cookie_domain'];
+            self::$ct = self::$config['defaultController'] ?? 'index';
+            self::$ac = self::$config['defaultAction'] ?? 'index';
+            self::$debug_ip = self::$config['debug_ip'] ?? '';
+            self::$cookie_domain = self::$config['cookie_domain'] ?? '';
+            self::$cacheType = self::$config['cacheType'] ?? 'file';
         }
         if(PHP_SAPI == 'cli')
         {

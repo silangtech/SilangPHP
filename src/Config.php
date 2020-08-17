@@ -21,6 +21,7 @@ Class Config
     use Instance;
     //框架配置文件
     public $config = [];
+
     /**
      * 初始化配置
      * 先要引进文件
@@ -90,6 +91,7 @@ Class Config
             return self::instance()->config[$key];
         }
     }
+
     /**
      * 递归设置数据
      */
@@ -105,6 +107,7 @@ Class Config
         }
         return $data;
     }
+
     /**
      * 更新配置
      * 代码自动生成数据配置

@@ -19,7 +19,7 @@ class IndexController extends \SilangPHP\Controller
         Tpl::assign("test","test1");
         Tpl::display('index');
     }
-    
+
     public function afterAction()
     {
         echo 'end'.lr;

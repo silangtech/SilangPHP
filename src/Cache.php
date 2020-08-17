@@ -19,10 +19,10 @@ Class Cache{
     //缓存记录内存变量
     private $caches = array();
 
-    //文件缓存系统或memcache游标
+    //文件缓存系统或redis
     private $mc_handle = null;
 
-    //缓存类型（file|memcache|memcached）
+    //缓存类型（file|redis）
     public static $cache_type = 'file';
 
     //key默认前缀
@@ -41,11 +41,14 @@ Class Cache{
      * 构造函数
      * @return void
      */
-    public function __construct($fileName = 'cachefile' ,$type = 'file', $cache_time='3600')
+    public function __construct($type = '', $fileName = 'cachefile' , $cache_time='3600')
     {
         self::$df_prefix  = PS_APP_NAME;
         self::$cache_time = $cache_time;
-        self::$cache_type = $type;
+        if(empty($type))
+        {
+            self::$cache_type = \SilangPHP\SilangPHP::$cacheType;
+        }
         if( self::$cache_type == 'file' )
         {
             $this->mc_handle = \SilangPHP\Cache\File::factory( $fileName );
@@ -53,7 +56,6 @@ Class Cache{
         {
             $this->mc_handle = new \SilangPHP\Cache\Redis();
         }
-        // 这就不增加redis了
     }
 
     /**
@@ -62,7 +64,7 @@ Class Cache{
     protected static function _check_instance()
     {
         if( self::$instance == null ) {
-            self::$instance = new cache();
+            self::$instance = new Cache();
         }
         return self::$instance;
     }
@@ -72,7 +74,7 @@ Class Cache{
      */
     protected static function _get_key($prefix, $key)
     {
-        $key = base64_encode(cache::$df_prefix.'_'.$prefix.'_'.$key);
+        $key = base64_encode(Cache::$df_prefix.'_'.$prefix.'_'.$key);
         if( strlen($key) > 32 ) $key = md5( $key );
         return $key;
     }
@@ -148,7 +150,7 @@ Class Cache{
     public static function free_mem()
     {
         if( isset(self::$instance->mc_handle->caches) ) {
-            self::$instance->mc_handle->caches = array();
+            self::$instance->mc_handle->caches = [];
         }
     }
 

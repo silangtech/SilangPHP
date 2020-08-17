@@ -131,6 +131,10 @@ class Response
         $this->body .= $result;
     }
 
+    /**
+     * 发送数据
+     * @param string $data
+     */
     public function send($data = '')
     {
         if($data)

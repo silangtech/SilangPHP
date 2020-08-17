@@ -54,14 +54,25 @@ abstract class Controller
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtoupper($_SERVER['HTTP_X_REQUESTED_WITH'])=='XMLHTTPREQUEST';
     }
 
-    public function success($msg = '')
+    /**
+     * 成功返回
+     * @param string $msg
+     * @return mixed
+     */
+    public function success($msg = '',$data = '')
     {
-        return Response::json(0,$msg);
+        return $this->response->json(0,$msg,$data);
     }
 
+    /**
+     * 失败返回
+     * @param int $code
+     * @param string $msg
+     * @return mixed
+     */
     public function fail($code = -1,$msg = '')
     {
-        return Response::json($code);
+        return $this->response->json($code,$msg);
     }
 
 }

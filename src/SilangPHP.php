@@ -146,31 +146,38 @@ final Class SilangPHP
     public static function run($pathinfo = '')
     {
         self::$startTime = microtime(true);
-        if(empty(self::$appDir))
-        {
-            return false;
-        }else{
-            self::initialize();
-        }
-        $cli = 0;
-        if(run_mode == '2')
-        {
-            if(self::$mode != 0)
+        try{
+            if(empty(self::$appDir))
             {
-                $cli = 0;
+                return false;
             }else{
-                $cli = 1;
+                self::initialize();
             }
-        }
-        self::updateR();
-        if($cli == 1)
-        {
-            Console::start();
-        }else{
-            $res = Route::start($pathinfo);
+            $cli = 0;
+            if(run_mode == '2')
+            {
+                if(self::$mode != 0)
+                {
+                    $cli = 0;
+                }else{
+                    $cli = 1;
+                }
+            }
+            self::updateR();
+            if($cli == 1)
+            {
+                Console::start();
+            }else{
+                $res = Route::start($pathinfo);
+            }
+            return self::$response->end($res);
+        }catch(\SilangPHP\Exception\routeException $e){
+            if(self::$debug == 1 || $cli == 1)
+            {
+                echo '404';
+            }
+            return '';
         }
         self::$endTime = microtime(true);
-        return self::$response->end($res);
-
     }
 }

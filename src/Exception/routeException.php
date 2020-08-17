@@ -15,12 +15,17 @@
 */
 declare(strict_types=1);
 namespace SilangPHP\Exception;
+use SilangPHP\SilangPHP;
+
 /**
  * 路由异常
  * Class routeException
  * @package SilangPHP\Exception
  */
-Class routeException extends \PDOException
+Class routeException extends \Exception
 {
+    public function __construct($message = "", $code = 0, Throwable $previous = null) {
 
+        \SilangPHP\Facade\Log::error(json_encode(SilangPHP::$request).$message);
+    }
 }

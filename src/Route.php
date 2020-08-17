@@ -15,6 +15,7 @@
 */
 declare(strict_types=1);
 namespace SilangPHP;
+use \SilangPHP\Exception\routeException;
 use SilangPHP\Facade\Log;
 class Route
 {
@@ -103,19 +104,21 @@ class Route
             }
             if($found){
                 Log::info("Controller: $file");
-            }
-            // todo 后续改成event驱动
-            if(method_exists($ins,'beforeAction'))
-            {
-                call_user_func_array(array($ins, 'beforeAction'), []);
-            }
-            if(method_exists($ins,'afterAction'))
-            {
-                $tmp = call_user_func_array(array($ins, $action), $argsParam );
-                call_user_func_array(array($ins, 'afterAction'), []);
-                return $tmp;
+                // todo 后续改成event驱动
+                if(method_exists($ins,'beforeAction'))
+                {
+                    call_user_func_array(array($ins, 'beforeAction'), []);
+                }
+                if(method_exists($ins,'afterAction'))
+                {
+                    $tmp = call_user_func_array(array($ins, $action), $argsParam );
+                    call_user_func_array(array($ins, 'afterAction'), []);
+                    return $tmp;
+                }else{
+                    return call_user_func_array(array($ins, $action), $argsParam );
+                }
             }else{
-                return call_user_func_array(array($ins, $action), $argsParam );
+                throw new routeException("ca error!");
             }
         }
         return false;
@@ -123,7 +126,7 @@ class Route
 
     /**
      * 加载 rewrite rule 文件
-     * @todo 天上则的支持
+     * @todo 正则的支持
      */
     protected static function load_rule()
     {

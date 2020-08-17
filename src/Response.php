@@ -108,10 +108,10 @@ class Response
      * headers
      * 输出json
      */
-    public function json($code=0,$msg='',$data='')
+    public function json($code=0,$msg='',$data='',$jsontype = JSON_UNESCAPED_UNICODE)
     {
         $result = $this->returnArray($code,$msg,$data);
-        return json_encode($result);
+        return json_encode($result,$jsontype);
     }
 
     /**

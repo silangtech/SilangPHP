@@ -163,14 +163,14 @@ final Class SilangPHP
                     $cli = 1;
                 }
             }
-            self::updateR();
             if($cli == 1)
             {
                 Console::start();
             }else{
+                self::updateR();
                 $res = Route::start($pathinfo);
+                return self::$response->end($res);
             }
-            return self::$response->end($res);
         }catch(\SilangPHP\Exception\routeException $e){
             if(self::$debug == 1 || $cli == 1)
             {

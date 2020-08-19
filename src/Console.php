@@ -35,24 +35,34 @@ Class Console{
     public static $action = [];
     public static $input = '';
     public static $output;
-    public static $uid = '33';
-    public static $gid = '33';
+    public static $uid = 33;
+    public static $gid = 33;
 
     /**
      * 运行Command
      */
     public static function start()
     {
+        self::changeUser();
         echo self::$welcome;
         $argv = $_SERVER['argv'];
-        $action = self::getAction($argv[1]);
-        $command = self::getOpt($argv[2]);
-        self::$input = $command;
+        if(isset($argv[1]))
+        {
+            $action = self::getAction($argv[1]);
+        }else{
+            echo PHP_EOL."\033[31m 缺少 action!! \033[0m".PHP_EOL;
+            return false;
+        }
+        if(isset($argv[2]))
+        {
+            $command = self::getOpt($argv[2]);
+            self::$input = $command;
+        }
         $controller = $action[0];
         $action = $action[1];
-        $cls = PS_APP_NAME.'\\Controller\\'. $controller . 'Controller';
+        $cls = PS_APP_NAME.'\\Controller\\'. $controller . 'Commander';
         if(!class_exists($cls)){
-            throw new \Exception("Controller $cls not found!");
+            throw new \Exception("Commander $cls not found!");
         }
         $ins = new $cls();
         if(method_exists($ins, $action)){
@@ -97,7 +107,7 @@ Class Console{
      * 改变进程的用户ID
      * @param $user
      */
-    public static function changeUser($uid='33',$gid='33')
+    public static function changeUser($uid=33,$gid=33)
     {
         posix_setuid($uid);
         posix_setgid($gid);

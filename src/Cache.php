@@ -48,6 +48,8 @@ Class Cache{
         if(empty($type))
         {
             self::$cache_type = \SilangPHP\SilangPHP::$cacheType;
+        }else{
+            self::$cache_type = $type;
         }
         if( self::$cache_type == 'file' )
         {
@@ -64,7 +66,7 @@ Class Cache{
     protected static function _check_instance()
     {
         if( self::$instance == null ) {
-            self::$instance = new Cache();
+            self::$instance = new Cache(self::$cache_type);
         }
         return self::$instance;
     }
@@ -99,6 +101,7 @@ Class Cache{
         if( self::$need_mem ) {
             self::$instance->mc_handle->caches[ $key ] = $value;
         }
+//        var_dump(self::$instance->mc_handle);
         return self::$instance->mc_handle->set($key, $value, $cachetime);
     }
 

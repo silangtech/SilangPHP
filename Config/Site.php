@@ -12,6 +12,7 @@ return [
     // 调试模式
     'debug' => 1,
     'debug_ip' => '',
+    'cacheType' => 'file', // [ file | redis ]
     'defaultController' => 'index',
     'defaultAction' => 'index',
 ];

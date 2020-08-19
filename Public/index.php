@@ -2,7 +2,6 @@
 /**
  * 普通模式下的入口
  */
-
 define("PS_ROOT_PATH",       dirname(dirname(__FILE__)));
 require_once(PS_ROOT_PATH."/vendor/autoload.php");
 

@@ -43,7 +43,7 @@ Class Cache{
      */
     public function __construct($type = '', $fileName = 'cachefile' , $cache_time='3600')
     {
-        self::$df_prefix  = PS_APP_NAME;
+//        self::$df_prefix  = PS_APP_NAME;
         self::$cache_time = $cache_time;
         if(empty($type))
         {
@@ -87,7 +87,7 @@ Class Cache{
      * @parem $cachetime  有效时间(0不限, -1使用系统默认)
      * @return void
      */
-    public static function set($prefix, $key, $value, $cachetime=-1)
+    public static function set( $key, $value, $cachetime=-1)
     {
         if( self::_check_instance()===false ) {
             return false;
@@ -95,7 +95,7 @@ Class Cache{
         if($cachetime==-1) {
             $cachetime = self::$cache_time;
         }
-        $key = self::_get_key($prefix, $key);
+//        $key = self::_get_key( $key);
         if( self::$need_mem ) {
             self::$instance->mc_handle->caches[ $key ] = $value;
         }
@@ -108,12 +108,12 @@ Class Cache{
      * @parem $key        键
      * @return void
      */
-    public static function del($prefix, $key)
+    public static function del($key)
     {
         if( self::_check_instance()===false ) {
             return false;
         }
-        $key = self::_get_key($prefix, $key);
+//        $key = self::_get_key($prefix, $key);
         if( isset(self::$instance->mc_handle->caches[ $key ]) ) {
             self::$instance->mc_handle->caches[ $key ] = false;
             unset(self::$instance->mc_handle->caches[ $key ]);
@@ -127,7 +127,7 @@ Class Cache{
      * @parem $key        键
      * @return void
      */
-    public static function get($prefix, $key)
+    public static function get($key)
     {
         //全局禁用cache(调试使用的情况)
         if( defined('NO_CACHE') && NO_CACHE ) {
@@ -136,7 +136,7 @@ Class Cache{
         if( self::_check_instance()===false ) {
             return false;
         }
-        $key = self::_get_key($prefix, $key);
+//        $key = self::_get_key($prefix, $key);
         if( isset(self::$instance->mc_handle->caches[ $key ]) ) {
             return self::$instance->mc_handle->caches[ $key ];
         }

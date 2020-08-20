@@ -18,24 +18,10 @@ namespace SilangPHP\Cache;
 use SilangPHP\Cache;
 
 //将gc_probability 也调成1000，那gc_probability/gc_divisor 就等于1了，也就是百分一百会触发。这样就垃圾回收概率就大的多。
-ini_set('session.gc_divisor', 1000);
-ini_set('session.gc_probability', 1000);
-//session_write_close();
-session_set_save_handler(
-    "\SilangPHP\Cache\SessionHandler::init",
-    "\SilangPHP\Cache\SessionHandler::close",
-    "\SilangPHP\Cache\SessionHandler::read",
-    "\SilangPHP\Cache\SessionHandler::write",
-    "\SilangPHP\Cache\SessionHandler::destroy",
-    "\SilangPHP\Cache\SessionHandler::gc"
-);
-//后面可使用 
-$session_path = PS_RUNTIME_PATH;
-// $session_path = "/tmp/";
-session_save_path( $session_path.'/session' );
-//要确保有session的文件夹，不然session将会失效
-//echo 'session start';
+ini_set('session.gc_divisor', '1000');
+ini_set('session.gc_probability', '1000');
 
+//要确保有session的文件夹，不然session将会失效
 /**
  * session接口类
  */
@@ -59,6 +45,23 @@ class SessionHandler
     //文件缓存类句柄
     private static $fc_handler   = null;
 
+    public static function register()
+    {
+        //session_write_close();
+        session_set_save_handler(
+            "\SilangPHP\Cache\SessionHandler::init",
+            "\SilangPHP\Cache\SessionHandler::close",
+            "\SilangPHP\Cache\SessionHandler::read",
+            "\SilangPHP\Cache\SessionHandler::write",
+            "\SilangPHP\Cache\SessionHandler::destroy",
+            "\SilangPHP\Cache\SessionHandler::gc"
+        );
+//后面可使用
+        $session_path = PS_RUNTIME_PATH;
+        // $session_path = "/tmp/";
+        session_save_path( $session_path.'session' );
+    }
+
     /**
      * 页面执行了session_start后首先调用的函数
      * @parem $save_path
@@ -81,7 +84,7 @@ class SessionHandler
      */
     public static function read( $session_id )
     {
-        return Cache::get("sess_".$session_id);
+        return (String)Cache::get("sess_".$session_id);
     }
 
     /**

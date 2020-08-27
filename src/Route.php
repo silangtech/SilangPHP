@@ -54,8 +54,9 @@ class Route
             $path =  SilangPHP::$ct."/".SilangPHP::$ac;
         }
         self::$path_array = preg_split("/[\/]/",$path,-1,PREG_SPLIT_NO_EMPTY);
-        $controller = self::$path_array[0];
-        $action = self::$path_array[1];
+        // 统一规范
+        $controller = ucfirst(self::$path_array[0]);
+        $action = strtolower(self::$path_array[1]);
         unset(self::$path_array[0],self::$path_array[1]);
         return self::load_controller($controller,$action);
     }

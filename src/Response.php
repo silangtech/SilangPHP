@@ -126,7 +126,7 @@ class Response
     public function end($result = '')
     {
         // 输出header与body
-        return $result;
+        echo $result;
     }
 
     /**

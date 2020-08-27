@@ -147,6 +147,15 @@ class Log
     }
 
     /**
+     * 记录一下
+     * @param $data
+     */
+    public function record($data)
+    {
+        $this->_action($data,__FUNCTION__);
+    }
+
+    /**
      * 设置日志地址
      */
     public function setLogPath($path = '')

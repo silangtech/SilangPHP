@@ -139,6 +139,17 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
     }
 
     /**
+     * 指定字段
+     * @param string $fields
+     * @return $this
+     */
+    public function field($fields = '*')
+    {
+        $this->fields = $fields;
+        return $this;
+    }
+
+    /**
      * get_one
      */
     public function get_one($where = [])
@@ -148,11 +159,10 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
 
     /**
      * 返回所有数据
+     * 某种时候要分页
      */
     public function get_all($where = [])
     {
-        $limit = [($this->page-1) * $this->limit,$this->limit];
-        $where['LIMIT'] = $limit;
         return parent::select($this->table_name,$this->fields,$where);
     }
 
@@ -161,6 +171,8 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
      */
     public function list($where = [])
     {
+        $limit = [($this->page-1) * $this->limit,$this->limit];
+        $where['LIMIT'] = $limit;
         $data = $this->get_all($where);
         $total = $this->count($this->table_name,$where);
         return [

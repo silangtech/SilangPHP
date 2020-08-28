@@ -65,6 +65,11 @@ Class Console{
             throw new \Exception("Commander $cls not found!");
         }
         $ins = new $cls();
+        if(property_exists($cls,'input'))
+        {
+            $ins->input = self::$input;
+        }
+
         if(method_exists($ins, $action)){
             // 注入$input即可
             $ins->$action();

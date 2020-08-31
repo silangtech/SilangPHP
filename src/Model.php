@@ -39,6 +39,7 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
     public $fields = '*';
     //表格数据
     public $attr;
+    public $conn_status = false;
 
     public function __construct()
     {
@@ -56,8 +57,10 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
                 'port' => $config['port'],
             ];
             parent::__construct($options);
+            $this->conn_status = true;
         }catch(dbException $e)
         {
+            $this->conn_status = false;
             Facade\Log::alert("数据库链接失败".$e->getSql());
 //            echo $e->getSql();
         }
@@ -88,16 +91,16 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
 
     }
 
-    public function create()
-    {
-        return new static();
-    }
+//    public function create()
+//    {
+//        return new static();
+//    }
 
     public function __set($key,$value)
     {
         $this->attr[$key] = $value;
     }
-    
+
     public function __get($key)
     {
         return $this->attr[$key];
@@ -145,7 +148,9 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
      */
     public function field($fields = '*')
     {
+
         $this->fields = $fields;
+        $this->fields = explode(",",$this->fields);
         return $this;
     }
 
@@ -154,16 +159,19 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
      */
     public function get_one($where = [])
     {
-        return parent::get($this->table_name,$this->fields,$where);
+        $tmp = parent::get($this->table_name,$this->fields,$where);
+        $this->fields = '*';
+        return $tmp;
     }
 
     /**
      * 返回所有数据
-     * 某种时候要分页
      */
     public function get_all($where = [])
     {
-        return parent::select($this->table_name,$this->fields,$where);
+        $tmp = parent::select($this->table_name,$this->fields,$where);
+        $this->fields = '*';
+        return $tmp;
     }
 
     /**
@@ -191,7 +199,8 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
         {
             $attrs = $this->attr;
         }
-        parent::insert($this->table_name,$attrs);
+//        $tmp = parent::debug()->insert($this->table_name,$attrs);
+        $tmp = parent::insert($this->table_name,$attrs);
         if($this->error()['0'] != '00000')
         {
             Facade\Log::alert(json_encode($this->error()));

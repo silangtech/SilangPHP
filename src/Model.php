@@ -151,6 +151,10 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
 
         $this->fields = $fields;
         $this->fields = explode(",",$this->fields);
+        if(count($this->fields) == 1)
+        {
+            $this->fields = $fields;
+        }
         return $this;
     }
 

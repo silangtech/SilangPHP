@@ -68,7 +68,7 @@ class Route
      * @throws \ReflectionException
      */
     private static function load_controller($base, $action){
-        $dir = PS_APP_PATH . '/controller/' . $base;
+        $dir = PS_APP_PATH . '/Controller/' . $base;
         $file = $dir . 'Controller.php';
         #echo join(', ', array($base, $action, $file)) . "\n";
         if(file_exists($file)){

@@ -35,8 +35,7 @@ Class Console{
     public static $action = [];
     public static $input = '';
     public static $output;
-    public static $uid = 33;
-    public static $gid = 33;
+    public static $user = 'www-data';
 
     /**
      * 运行Command
@@ -114,8 +113,17 @@ Class Console{
      */
     public static function changeUser($uid=33,$gid=33)
     {
-        posix_setuid($uid);
-        posix_setgid($gid);
+        $info=posix_getpwnam(self::$user);
+        if($info == false)
+        {
+            // www备用
+            $info=posix_getpwnam('www');
+        }
+        if($info)
+        {
+            posix_setuid($info['uid']);
+            posix_setgid($info['gid']);
+        }
     }
 
 

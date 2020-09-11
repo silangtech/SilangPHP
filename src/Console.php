@@ -60,7 +60,7 @@ Class Console{
         }
         $controller = $action[0];
         $action = $action[1];
-        $cls = PS_APP_NAME.'\\Controller\\'. $controller . 'Commander';
+        $cls = PS_APP_NAME.'\\Command\\'. $controller . 'Commander';
         if(!class_exists($cls)){
             throw new \Exception("Commander $cls not found!");
         }

@@ -123,7 +123,12 @@ class Request
      */
     public function postjson()
     {
-        return $this->getRaw();
+        $data = $this->getRaw();
+        if($data)
+        {
+            $data = json_decode($data,true);
+        }
+        return $data;
     }
 
     /**

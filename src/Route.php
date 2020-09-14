@@ -57,6 +57,8 @@ class Route
         // 统一规范
         $controller = ucfirst(self::$path_array[0]);
         $action = strtolower(self::$path_array[1]);
+        \SilangPHP\SilangPHP::$ct = $controller;
+        \SilangPHP\SilangPHP::$ac = $action;
         unset(self::$path_array[0],self::$path_array[1]);
         return self::load_controller($controller,$action);
     }

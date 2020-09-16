@@ -40,23 +40,35 @@ Class Console{
     /**
      * 运行Command
      */
-    public static function start()
+    public static function start($action='',$input='',$usergroup=[])
     {
-        self::changeUser();
+        self::changeUser($usergroup);
         echo self::$welcome;
         $argv = $_SERVER['argv'];
-        if(isset($argv[1]))
+        if($action)
         {
-            $action = self::getAction($argv[1]);
+            $action = self::getAction($action);
         }else{
-            echo PHP_EOL."\033[31m 缺少 action!! \033[0m".PHP_EOL;
-            return false;
+            if(isset($argv[1]))
+            {
+                $action = self::getAction($argv[1]);
+            }else{
+                echo PHP_EOL."\033[31m 缺少 action!! \033[0m".PHP_EOL;
+                return false;
+            }
         }
-        if(isset($argv[2]))
+        if($input)
         {
-            $command = self::getOpt($argv[2]);
+            $command = self::getOpt($input);
             self::$input = $command;
+        }else{
+            if(isset($argv[2]))
+            {
+                $command = self::getOpt($argv[2]);
+                self::$input = $command;
+            }
         }
+
         $controller = $action[0];
         $action = $action[1];
         $cls = PS_APP_NAME.'\\Command\\'. $controller . 'Commander';
@@ -71,7 +83,7 @@ Class Console{
 
         if(method_exists($ins, $action)){
             // 注入$input即可
-            $ins->$action();
+            return $ins->$action();
         }
     }
 
@@ -111,8 +123,12 @@ Class Console{
      * 改变进程的用户ID
      * @param $user
      */
-    public static function changeUser($uid=33,$gid=33)
+    public static function changeUser($usergroup = [])
     {
+        if(isset($usergroup['user']))
+        {
+            self::$user = $usergroup['user'];
+        }
         $info=posix_getpwnam(self::$user);
         if($info == false)
         {

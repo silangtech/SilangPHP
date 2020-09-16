@@ -165,7 +165,7 @@ final Class SilangPHP
             }
             if($cli == 1)
             {
-                Console::start();
+                return Console::start($pathinfo);
             }else{
                 self::updateR();
                 $res = Route::start($pathinfo);

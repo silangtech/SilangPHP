@@ -25,8 +25,10 @@ abstract class Controller
     public function __construct()
     {
         $this->is_ajax = $this->is_ajax();
-        $this->request = Di::instance()->get(\SilangPHP\Request::class);
-        $this->response = Di::instance()->get(\SilangPHP\Response::class);
+        $this->request = SilangPHP::$request;
+        $this->response = SilangPHP::$response;
+//        $this->request = Di::instance()->get(\SilangPHP\Request::class);
+//        $this->response = Di::instance()->get(\SilangPHP\Response::class);
     }
 
     /**

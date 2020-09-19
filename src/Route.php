@@ -42,11 +42,24 @@ class Route
         $method = $_SERVER['REQUEST_METHOD'];
         $path = trim($path,"/");
         $path = parse_url($path,PHP_URL_PATH);
+        // 直接找
         if(isset(self::$rules[$path.'_'.$method]))
         {
             $path = self::$rules[$path.'_'.$method];
         }else{
             // 开启某种模式跳404
+            if(self::$rules)
+            {
+                foreach(self::$rules as $rulekey => $re)
+                {
+                    $ruleStatus = preg_match("/^".$rulekey."$/",$path.'_'.$method);
+                    if($ruleStatus)
+                    {
+                        $path = self::$rules[$rulekey];
+                        break;
+                    }
+                }
+            }
         }
         // 默认加载的类
         if(empty($path) || $path === '/' || $path === 'index.php')
@@ -107,7 +120,7 @@ class Route
             }
             if($found){
                 Log::info("Controller: $file");
-                // todo 后续改成event驱动
+                // @todo 后续改成event驱动
                 if(method_exists($ins,'beforeAction'))
                 {
                     call_user_func_array(array($ins, 'beforeAction'), []);
@@ -129,7 +142,6 @@ class Route
 
     /**
      * 加载 rewrite rule 文件
-     * @todo 正则的支持
      */
     protected static function load_rule()
     {
@@ -145,22 +157,22 @@ class Route
                 if($val['0'] == 'rest' && !empty($val['1']))
                 {
                     // rest模式
-                    $Rule[$val['1'].'_GET'] = 'get';
-                    $Rule[$val['1'].'_POST'] = 'post';
-                    $Rule[$val['1'].'_PUT'] = 'put';
-                    $Rule[$val['1'].'_DELETE'] = 'delete';
-                    $Rule[$val['1'].'_PATCH'] = 'patch';
-                    $Rule[$val['1'].'_HEAD'] = 'head';
-                    $Rule[$val['1'].'_OPTIONS'] = 'options';
+                    $Rulenew[$val['1'].'_GET'] = 'get';
+                    $Rulenew[$val['1'].'_POST'] = 'post';
+                    $Rulenew[$val['1'].'_PUT'] = 'put';
+                    $Rulenew[$val['1'].'_DELETE'] = 'delete';
+                    $Rulenew[$val['1'].'_PATCH'] = 'patch';
+                    $Rulenew[$val['1'].'_HEAD'] = 'head';
+                    $Rulenew[$val['1'].'_OPTIONS'] = 'options';
                 }
                 if(!isset($val['0']) || !isset($val['1']) || !isset($val['2']) )
                 {
                     continue;
                 }
                 $val['0'] = strtoupper($val['0']);
-                $Rule[$val['1'].'_'.$val['0']] = $val['2'];
+                $Rulenew[$val['1'].'_'.$val['0']] = $val['2'];
             }
-            self::$rules = $Rule;
+            self::$rules = $Rulenew;
         }
     }
 

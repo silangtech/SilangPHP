@@ -8,7 +8,7 @@ return [
         //相当于default
         'master' => [
             'host' => '172.20.0.77',
-            'port' => '3306',
+            'port' => 3306,
             'dbname' => 'phpshow',
             'username' => 'root',
             'password' => 'root',
@@ -16,9 +16,9 @@ return [
     ],
     'redis' => [
         'master' => [
-            'host' => '172.20.0.5',
-            'port' => '6379',
-            'db' => '0',
+            'host' => '172.17.0.5',
+            'port' => 6379,
+            'db' => 0,
             'auth' => '',
         ]
     ],

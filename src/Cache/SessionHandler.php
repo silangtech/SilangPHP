@@ -18,9 +18,6 @@ namespace SilangPHP\Cache;
 use SilangPHP\Cache;
 
 //将gc_probability 也调成1000，那gc_probability/gc_divisor 就等于1了，也就是百分一百会触发。这样就垃圾回收概率就大的多。
-ini_set('session.gc_divisor', '1000');
-ini_set('session.gc_probability', '1000');
-
 //要确保有session的文件夹，不然session将会失效
 /**
  * session接口类
@@ -39,27 +36,36 @@ class SessionHandler
     //session_live_time
     private static $session_live_time = 3600;
 
-    //session类型 file || mysql
-    private static $session_type = '';
+    //session类型 file || mysql || redis
+    public static $session_type = 'redis';
 
     //文件缓存类句柄
     private static $fc_handler   = null;
 
+    private static $hand = 0;
+
     public static function register()
     {
         //session_write_close();
-        session_set_save_handler(
-            "\SilangPHP\Cache\SessionHandler::init",
-            "\SilangPHP\Cache\SessionHandler::close",
-            "\SilangPHP\Cache\SessionHandler::read",
-            "\SilangPHP\Cache\SessionHandler::write",
-            "\SilangPHP\Cache\SessionHandler::destroy",
-            "\SilangPHP\Cache\SessionHandler::gc"
-        );
+        if(self::$hand == 0)
+        {
+            Cache::$fileName = 'sessionCache';
+            Cache::$cache_type = self::$session_type;
+            session_set_save_handler(
+                "\SilangPHP\Cache\SessionHandler::init",
+                "\SilangPHP\Cache\SessionHandler::close",
+                "\SilangPHP\Cache\SessionHandler::read",
+                "\SilangPHP\Cache\SessionHandler::write",
+                "\SilangPHP\Cache\SessionHandler::destroy",
+                "\SilangPHP\Cache\SessionHandler::gc"
+            );
 //后面可使用
-        $session_path = PS_RUNTIME_PATH;
-        // $session_path = "/tmp/";
-        session_save_path( $session_path.'session' );
+            $session_path = PS_RUNTIME_PATH;
+            // $session_path = "/tmp/";
+            session_save_path( $session_path.'session' );
+            self::$hand = 1;
+        }
+
     }
 
     /**
@@ -73,7 +79,7 @@ class SessionHandler
         self::$session_name = $cookie_name;
         self::$session_path = $save_path;
         self::$session_id   = session_id();
-        self::$session_live_time = empty(self::$session_live_time) ? ini_get('session.gc_maxlifetime') : self::$session_live_time;
+//        self::$session_live_time = empty(self::$session_live_time) ? ini_get('session.gc_maxlifetime') : self::$session_live_time;
         return true;
     }
 
@@ -84,7 +90,8 @@ class SessionHandler
      */
     public static function read( $session_id )
     {
-        return (String)Cache::get("sess_".$session_id);
+        $tmp = (String)Cache::get("sess_".$session_id);
+        return $tmp;
     }
 
     /**

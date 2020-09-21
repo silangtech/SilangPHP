@@ -34,14 +34,14 @@ class Redis
         $redis = new \Redis();
         //config文件夹读取 不连接会出现Redis server went away
         $config = Config::get("Db")['redis']['master'];
-        $redis->connect($config['host'], $config['port']);
+        $redis->connect($config['host'], (int)$config['port']);
         if(!empty($config['auth']))
         {
             $redis->auth($config['auth']);
         }
         if(isset($config['db']))
         {
-            $redis->select($config['db']);
+            $redis->select((int)$config['db']);
         }
         self::$hand_ob = $redis;
     }

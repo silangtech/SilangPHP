@@ -37,11 +37,13 @@ Class Cache{
     //是否使用内存数组
     public static $need_mem = true;
 
+    public static $fileName = 'cachefilec';
+
     /**
      * 构造函数
      * @return void
      */
-    public function __construct($type = '', $fileName = 'cachefile' , $cache_time='3600')
+    public function __construct($type = '', $fileName = '' , $cache_time='3600')
     {
 //        self::$df_prefix  = PS_APP_NAME;
         self::$cache_time = $cache_time;
@@ -50,6 +52,10 @@ Class Cache{
             self::$cache_type = \SilangPHP\SilangPHP::$cacheType;
         }else{
             self::$cache_type = $type;
+        }
+        if(empty($fileName))
+        {
+            $fileName = self::$fileName;
         }
         if( self::$cache_type == 'file' )
         {

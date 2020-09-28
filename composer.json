@@ -19,6 +19,7 @@
         "symfony/var-dumper": "^4.2",
         "phpunit/phpunit": "*"
     },
+    "minimum-stability": "dev",
     "_comment": "SilangPHP",
     "autoload": {
         "psr-4": {

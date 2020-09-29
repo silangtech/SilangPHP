@@ -186,6 +186,7 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
         $limit = [($this->page-1) * $this->limit,$this->limit];
         $where['LIMIT'] = $limit;
         $data = $this->get_all($where);
+        unset($where['LIMIT']);
         $total = $this->count($this->table_name,$where);
         return [
             'list' => $data,

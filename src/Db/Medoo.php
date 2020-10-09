@@ -353,7 +353,7 @@ class Medoo
         {
             $this->logs = [[$query, $map]];
         }
-
+        // todo pdo需要链接正常
         $statement = $this->pdo->prepare($query);
 
         if ($statement)

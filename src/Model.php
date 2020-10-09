@@ -61,8 +61,9 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
         }catch(dbException $e)
         {
             $this->conn_status = false;
-            Facade\Log::alert("数据库链接失败".$e->getSql());
+            Facade\Log::alert("数据库链接失败".$e->getSql()."|".$e->getMessage());
 //            echo $e->getSql();
+            throw new \PDOException($e->getMessage());
         }
     }
 

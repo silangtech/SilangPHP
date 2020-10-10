@@ -60,4 +60,22 @@ Class Http{
         $bodyStr = (string)$body;
         return $bodyStr;
     }
+
+    /**
+     * http PostJson
+     * @param $url
+     * @param $query
+     * @return string
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public static function postjson($url,$query)
+    {
+        $client = new Client();
+        $response = $client->post($url, [
+            'json' => $query
+        ]);
+        $body = $response->getBody();
+        $bodyStr = (string)$body;
+        return $bodyStr;
+    }
 }

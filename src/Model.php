@@ -225,6 +225,10 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
     public function update1($attrs,$where){
         //这个里where
         $data = parent::update($this->table_name,$attrs,$where);
+        if($data == false)
+        {
+            return false;
+        }
         return  $data->rowCount();
     }
 

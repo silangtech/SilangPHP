@@ -364,7 +364,6 @@ class Medoo
             }
 
             $statement->execute();
-
             $this->statement = $statement;
 
             return $statement;

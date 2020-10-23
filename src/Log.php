@@ -80,6 +80,16 @@ class Log
     }
 
     /**
+     * 直接写内容不用添加其它东西
+     * @param $data
+     */
+    public function write($data)
+    {
+        $date = date("YmdHi");
+        file_put_contents($this->path.'/'.$date.'.log',$data,FILE_APPEND|LOCK_EX);
+    }
+
+    /**
      * 记录log
      */
     public function log($data,$type='')

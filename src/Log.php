@@ -85,6 +85,13 @@ class Log
      */
     public function write($data)
     {
+        if($this->default_dir_type == 'date')
+        {
+            $default_dir = date("Ymd");
+            $this->setLogDirName($default_dir);
+        }else{
+            $this->setLogDirName($this->default_dir_type);
+        }
         $date = date("YmdHi");
         file_put_contents($this->path.'/'.$date.'.log',$data,FILE_APPEND|LOCK_EX);
     }

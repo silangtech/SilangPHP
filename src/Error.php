@@ -52,11 +52,16 @@ Class Error
      */
     public static function handler_debug_error($errno, $errmsg, $filename, $linenum, $vars)
     {
-        $err = self::debug_format_errmsg('debug', $errno, $errmsg, $filename, $linenum, $vars);
-        if( $err != '@' )
+        if(\SilangPHP\Config::get('Site.debug') == 1)
         {
-            self::$_debug_error_msg .= $err;
+            // 这里直接输出了
+            $err = self::debug_format_errmsg('debug', $errno, $errmsg, $filename, $linenum, $vars);
+            if( $err != '@' )
+            {
+                self::$_debug_error_msg .= $err;
+            }
         }
+
     }
 
     /**
@@ -175,6 +180,7 @@ Class Error
             $err .= "</font><br />\n";
         }
         $err .= $log_type=='debug' ? "</div>\n" : "------------------------------------------\n";
+        // 直接输出就ok了
         echo $err;
 //        return $err;
     }
@@ -184,10 +190,11 @@ Class Error
      * 显示调试信息（程序结束时执行）
      * 仅在 handler_php_shutdown 里调用
      * 只用于页面显示
+     * 这里暂时不用管
      */
     public static function show_debug_error()
     {
-        if(\SilangPHP\Config['site']['debug'] == 0)
+        if(\SilangPHP\Config('Site.debug') == 0)
         {
             return '';
         }

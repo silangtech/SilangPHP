@@ -95,6 +95,8 @@ class Route
                 throw new \Exception("Controller $cls not found!");
             }
             $ins = new $cls();
+            $ins->request = SilangPHP::$request;
+            $ins->response = SilangPHP::$response;
             $found = false;
             if(method_exists($ins, $action)){
                 $ins->action = $action;
@@ -123,12 +125,20 @@ class Route
                 // @todo 后续改成event驱动
                 if(method_exists($ins,'beforeAction'))
                 {
-                    call_user_func_array(array($ins, 'beforeAction'), []);
+                    $tmp = call_user_func_array(array($ins, 'beforeAction'), []);
+                    if(!empty($tmp))
+                    {
+                        return $tmp;
+                    }
                 }
                 if(method_exists($ins,'afterAction'))
                 {
                     $tmp = call_user_func_array(array($ins, $action), $argsParam );
-                    call_user_func_array(array($ins, 'afterAction'), []);
+                    $tmp2 = call_user_func_array(array($ins, 'afterAction'), []);
+                    if(!empty($tmp2))
+                    {
+                        return $tmp2;
+                    }
                     return $tmp;
                 }else{
                     return call_user_func_array(array($ins, $action), $argsParam );

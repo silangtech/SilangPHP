@@ -26,6 +26,9 @@ class JwtMiddleware
         if(isset($_SERVER['HTTP_AUTHORIZATION']))
         {
             $authorization = $_SERVER['HTTP_AUTHORIZATION'];
+        }elseif(isset($_SERVER['HTTP_X_TOKEN']))
+        {
+            $authorization = $_SERVER['HTTP_X_TOKEN'];
         }
         if(!empty($authorization))
         {
@@ -36,7 +39,7 @@ class JwtMiddleware
         if(empty($auth_data))
         {
             // 调试先关闭
-            return \SilangPHP\SilangPHP::$response->json(-1,'token失败异常');
+            return \SilangPHP\SilangPHP::$response->json(-1,'token校验异常');
         }
         $request->auth_data = $auth_data;
         $response = $next($request);

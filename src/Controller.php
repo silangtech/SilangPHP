@@ -16,25 +16,27 @@
 declare(strict_types=1);
 namespace SilangPHP;
 
-abstract class Controller
+// abstract
+class Controller
 {
     public $is_ajax = false;
     public $request;
     public $response;
+    public $middlewares = [];
+    public $exceptAction = [];
+    public $onlyAction = [];
     //默认使用的页数
     public function __construct()
     {
         $this->is_ajax = $this->is_ajax();
         $this->request = SilangPHP::$request;
         $this->response = SilangPHP::$response;
-//        $this->request = Di::instance()->get(\SilangPHP\Request::class);
-//        $this->response = Di::instance()->get(\SilangPHP\Response::class);
     }
 
     /**
      * 同个控制器，开始的时候调用
      */
-    public function beforeAction()
+    public function beforeAction($action = '')
     {
         return true;
     }
@@ -42,8 +44,44 @@ abstract class Controller
     /**
      * 同个控制器,end的时候调用
      */
-    public function afterAction()
+    public function afterAction($action = '')
     {
+        return true;
+    }
+
+    /**
+     * 中间件
+     */
+    public function middleware()
+    {
+        // 系统级别的中间件
+        $config = \SilangPHP\Config::get('Middleware');
+        if($config)
+        {
+            foreach($config as $key=>$val)
+            {
+                $this->middlewares[] = $val;
+            }
+        }
+        $this->middlewares = array_unique($this->middlewares);
+        return $this->middlewares;
+    }
+
+    /**
+     * 排除某方法之后调用中间件
+     */
+    public function except(Array $action)
+    {
+        $this->exceptAction = $action;
+        return true;
+    }
+
+    /**
+     * 只允许某方法调用中间件
+     */
+    public function only(Array $aciton)
+    {
+        $this->onlyAction = $aciton;
         return true;
     }
 

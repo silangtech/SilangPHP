@@ -122,27 +122,39 @@ class Route
             }
             if($found){
                 Log::info("Controller: $file");
-                // @todo 后续改成event驱动
                 if(method_exists($ins,'beforeAction'))
                 {
-                    $tmp = call_user_func_array(array($ins, 'beforeAction'), []);
-                    if(!empty($tmp))
+                    $response = call_user_func_array(array($ins, 'beforeAction'), [$action]);
+                    if(!empty($response))
                     {
-                        return $tmp;
+                        return $response;
                     }
                 }
+                $next = function ($request) use ($ins,$action,$argsParam) {
+                    return call_user_func_array(array($ins, $action), $argsParam );
+                };
+                $middlewares = $ins->middleware();
+                if($middlewares)
+                {
+                    if( (empty($ins->exceptAction) && empty($ins->onlyAction)) || (!empty($ins->exceptAction) && !in_array($action,$ins->exceptAction)) || ( !empty($ins->onlyAction) && in_array($action,$ins->onlyAction)) )
+                    {
+                        foreach ($middlewares as $middleware) {
+                            $next = function ($request) use ($next, $middleware) {
+                                return (new $middleware)->handle($request, $next);
+                            };
+                        }
+                    }
+                }
+                $response = $next(\SilangPHP\SilangPHP::$request);
                 if(method_exists($ins,'afterAction'))
                 {
-                    $tmp = call_user_func_array(array($ins, $action), $argsParam );
-                    $tmp2 = call_user_func_array(array($ins, 'afterAction'), []);
-                    if(!empty($tmp2))
+                    $response2 = call_user_func_array(array($ins, 'afterAction'), [$action]);
+                    if(!empty($response2) && !is_bool($response2))
                     {
-                        return $tmp2;
+                        return $response2;
                     }
-                    return $tmp;
-                }else{
-                    return call_user_func_array(array($ins, $action), $argsParam );
                 }
+                return $response;
             }else{
                 throw new routeException("ca error!");
             }

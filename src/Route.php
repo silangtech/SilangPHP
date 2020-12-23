@@ -125,7 +125,7 @@ class Route
                 if(method_exists($ins,'beforeAction'))
                 {
                     $response = call_user_func_array(array($ins, 'beforeAction'), [$action]);
-                    if(!empty($response))
+                    if(!empty($response) && !is_bool($response))
                     {
                         return $response;
                     }

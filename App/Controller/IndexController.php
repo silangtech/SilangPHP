@@ -1,12 +1,6 @@
 <?php
 namespace App\Controller;
 
-
-use SilangPHP\Session;
-use SilangPHP\Tpl;
-use SilangPHP\Cache;
-use SilangPHP\Db\Medoo;
-use App\Model\IndexModel;
 use App\Middleware\HelloMiddleware;
 use App\Middleware\TestMiddleware;
 

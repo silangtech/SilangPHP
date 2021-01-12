@@ -16,11 +16,44 @@
 declare(strict_types=1);
 namespace SilangPHP;
 use \SilangPHP\Exception\routeException;
-use SilangPHP\Facade\Log;
+use \SilangPHP\Facade\Log;
+use \SilangPHP\Traits\Instance;
 class Route
 {
     public static $rules = [];
+    public static $rules_exec = [];
+    public static $rule_pipe = [];
     public static $path_array = [];
+    use Instance;
+    /**
+     * 封装常用get方法
+     */
+    public static function get($path,\Closure $cb)
+    {
+        self::$rules_exec[$path.'_GET'] = $cb;
+    }
+
+    /**
+     * 封装常用post方法
+     */
+    public static function post($path,\Closure $cb)
+    {
+        self::$rules_exec[$path.'_POST'] = $cb;
+    }
+
+    public static function middle($method,$path_array = [],$middlewares = [])
+    {
+        if($path_array)
+        {
+            $method = strtoupper($method);
+            foreach($path_array as $path)
+            {
+                self::$rule_pipe[$path.'_'.$method] = $middlewares;
+            }
+            return true;
+        }
+        return false;
+    }
 
     /**
      * 路由开始
@@ -42,6 +75,11 @@ class Route
         $method = $_SERVER['REQUEST_METHOD'];
         $path = trim($path,"/");
         $path = parse_url($path,PHP_URL_PATH);
+        if(isset(self::$rules_exec[$path.'_'.$method]))
+        {
+            return call_user_func(self::$rules_exec[$path.'_'.$method]);
+        }
+        $middlewares = self::$rule_pipe[$path.'_'.$method] ?? [];
         // 直接找
         if(isset(self::$rules[$path.'_'.$method]))
         {
@@ -55,6 +93,7 @@ class Route
                     $ruleStatus = preg_match("/^".$rulekey."$/",$path.'_'.$method);
                     if($ruleStatus)
                     {
+                        $middlewares = self::$rule_pipe[$rulekey.'_'.$method] ?? [];
                         $path = self::$rules[$rulekey];
                         break;
                     }
@@ -68,12 +107,12 @@ class Route
         }
         self::$path_array = preg_split("/[\/]/",$path,-1,PREG_SPLIT_NO_EMPTY);
         // 统一规范
-        $controller = ucfirst(self::$path_array[0]);
-        $action = strtolower(self::$path_array[1]);
+        $controller = ucfirst(self::$path_array[0] ?? '');
+        $action = strtolower(self::$path_array[1] ?? '');
         \SilangPHP\SilangPHP::$ct = $controller;
         \SilangPHP\SilangPHP::$ac = $action;
         unset(self::$path_array[0],self::$path_array[1]);
-        return self::load_controller($controller,$action);
+        return self::load_controller($controller,$action,$middlewares);
     }
 
     /**
@@ -82,7 +121,7 @@ class Route
      * @return bool|mixed
      * @throws \ReflectionException
      */
-    private static function load_controller($base, $action){
+    private static function load_controller($base, $action, $middlewares = []){
         $dir = PS_APP_PATH . '/Controller/' . $base;
         $file = $dir . 'Controller.php';
         #echo join(', ', array($base, $action, $file)) . "\n";
@@ -121,7 +160,6 @@ class Route
                 }
             }
             if($found){
-                Log::info("Controller: $file");
                 if(method_exists($ins,'beforeAction'))
                 {
                     $response = call_user_func_array(array($ins, 'beforeAction'), [$action]);
@@ -133,7 +171,10 @@ class Route
                 $next = function ($request) use ($ins,$action,$argsParam) {
                     return call_user_func_array(array($ins, $action), $argsParam );
                 };
-                $middlewares = $ins->middleware();
+                if(empty($middlewares))
+                {
+                    $middlewares = $ins->middleware();
+                }
                 if($middlewares)
                 {
                     if( (empty($ins->exceptAction) && empty($ins->onlyAction)) || (!empty($ins->exceptAction) && !in_array($action,$ins->exceptAction)) || ( !empty($ins->onlyAction) && in_array($action,$ins->onlyAction)) )
@@ -193,6 +234,13 @@ class Route
                 }
                 $val['0'] = strtoupper($val['0']);
                 $Rulenew[$val['1'].'_'.$val['0']] = $val['2'];
+                if(isset($val['3']))
+                {
+                    if(is_array($val['3']))
+                    {
+                        self::$rule_pipe[$val['1'].'_'.$val['0']] = $val['3'];
+                    }
+                }
             }
             self::$rules = $Rulenew;
         }

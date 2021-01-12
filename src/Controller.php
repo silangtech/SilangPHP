@@ -44,7 +44,7 @@ class Controller
     /**
      * 同个控制器,end的时候调用
      */
-    public function afterAction($action = '')
+    public function afterAction($action = '' , $result = '')
     {
         return true;
     }

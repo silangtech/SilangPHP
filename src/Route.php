@@ -189,7 +189,7 @@ class Route
                 $response = $next(\SilangPHP\SilangPHP::$request);
                 if(method_exists($ins,'afterAction'))
                 {
-                    $response2 = call_user_func_array(array($ins, 'afterAction'), [$action]);
+                    $response2 = call_user_func_array(array($ins, 'afterAction'), [$action, $response]);
                     if(!empty($response2) && !is_bool($response2))
                     {
                         return $response2;

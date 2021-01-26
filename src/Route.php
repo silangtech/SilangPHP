@@ -18,7 +18,10 @@ namespace SilangPHP;
 use \SilangPHP\Exception\routeException;
 use \SilangPHP\Facade\Log;
 use \SilangPHP\Traits\Instance;
-class Route
+/**
+ * 简单路由，后期再更改
+ */
+class Route extends \FastRoute\Route
 {
     public static $rules = [];
     public static $rules_exec = [];
@@ -29,7 +32,7 @@ class Route
      * 封装常用get方法
      */
     public static function get($path,\Closure $cb)
-    {
+    { 
         self::$rules_exec[$path.'_GET'] = $cb;
     }
 
@@ -61,20 +64,83 @@ class Route
      * @return bool|mixed
      * @throws \ReflectionException
      */
-    public static function start($pathInfo = '')
+    public static function start($path = '' ,$method = 'GET')
     {
-        self::load_rule();
-        if(!empty($pathInfo)){
-            $path= $pathInfo;
-        }elseif(!empty($_SERVER['PATH_INFO'])){
-            $path= $_SERVER["PATH_INFO"];
-        }elseif(!empty($_SERVER['REQUEST_URI'])){
-            $path= $_SERVER["REQUEST_URI"];
-        }
-        // 未必要从$_SERVER里获取
-        $method = $_SERVER['REQUEST_METHOD'];
-        $path = trim($path,"/");
         $path = parse_url($path,PHP_URL_PATH);
+        // 默认加载的类
+        if(empty($path) || $path === '/' || $path === '/index.php')
+        {
+            $path =  SilangPHP::$app->ct."/".SilangPHP::$app->ac;
+        }
+        $uri = $path;
+        $dispatcher = false;
+        if(!class_exists(App\Router::class)){
+            $dispatcher = \FastRoute\simpleDispatcher(\App\Router::initialize());
+        }
+        if (false !== $pos = strpos($uri, '?')) {
+            $uri = substr($uri, 0, $pos);
+        }
+        $uri = rawurldecode($uri);
+        if($dispatcher)
+        {
+            $routeInfo = $dispatcher->dispatch($method, $uri);
+            switch ($routeInfo[0]) {
+                case \FastRoute\Dispatcher::NOT_FOUND:
+                    // 看看有没默认模式，没有就直接404
+                    if(Config::get("Site.routemode") == '2')
+                    {
+                        return '404';
+                    }else{
+                        return self::found($path,$method);
+                    }
+                    break;
+                case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+                    $allowedMethods = $routeInfo[1];
+                    break;
+                case \FastRoute\Dispatcher::FOUND:
+                    $handler = $routeInfo[1];
+                    $vars = $routeInfo[2];
+                    if(is_callable($handler))
+                    {
+                        $Reflection = new \ReflectionFunction($handler);
+                        $acParams = $Reflection->getParameters();
+                        $argsParam = [];
+                        if($acParams)
+                        {
+                            foreach($acParams as $acParam)
+                            {
+                                $acParamClass = $acParam->getType() && !$acParam->getType()->isBuiltin()  ? new \ReflectionClass($acParam->getType()->getName()) : null;
+                                if(!empty($acParamClass))
+                                {
+                                    $paramClassName = $acParamClass->name;
+                                    $argsParam[] = Di::instance()->make($paramClassName);
+                                }else{
+                                    if($vars)
+                                    {
+                                        $pathtmp = array_shift($vars);
+                                        if($pathtmp)
+                                        {
+                                            $argsParam[] = $pathtmp;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        return call_user_func_array($handler, $argsParam );
+                    }else{
+                        return self::found($handler,$method,$vars);
+                    }
+                    break;
+            }
+        }else{
+            return self::found($path,$method);
+        }
+    }
+
+    public static function found($path,$method,$vars = [])
+    {
+        $path = trim($path,"/");
+        self::load_rule();
         if(isset(self::$rules_exec[$path.'_'.$method]))
         {
             return call_user_func(self::$rules_exec[$path.'_'.$method]);
@@ -88,31 +154,43 @@ class Route
             // 开启某种模式跳404
             if(self::$rules)
             {
-                foreach(self::$rules as $rulekey => $re)
+                foreach(self::$rules as $rulekey => $rulepath)
                 {
                     $ruleStatus = preg_match("/^".$rulekey."$/",$path.'_'.$method);
                     if($ruleStatus)
                     {
                         $middlewares = self::$rule_pipe[$rulekey.'_'.$method] ?? [];
-                        $path = self::$rules[$rulekey];
+                        $path =  $rulepath;
                         break;
                     }
                 }
             }
         }
-        // 默认加载的类
-        if(empty($path) || $path === '/' || $path === 'index.php')
+        self::$path_array = preg_split("/[\/]/",$path,-1,\PREG_SPLIT_NO_EMPTY);
+        $controllerpath = PS_APP_PATH.'/Controller/';
+        $controlstack = [];
+        foreach(self::$path_array as $searchkey => $searchpath)
         {
-            $path =  SilangPHP::$ct."/".SilangPHP::$ac;
+            $controllerpath2 = $controllerpath.ucfirst($searchpath).'/';
+            if(file_exists($controllerpath2))
+            {
+                $controllerpath = $controllerpath2;
+                array_push($controlstack,ucfirst($searchpath));
+                unset(self::$path_array[$searchkey]);
+            }else{
+                $controller = ucfirst($searchpath);
+                array_push($controlstack,$controller);
+                unset(self::$path_array[$searchkey]);
+                $action = isset(self::$path_array[$searchkey+1]) ? self::$path_array[$searchkey+1] : '';
+                unset(self::$path_array[$searchkey + 1]);
+                break;
+            }
         }
-        self::$path_array = preg_split("/[\/]/",$path,-1,PREG_SPLIT_NO_EMPTY);
-        // 统一规范
-        $controller = ucfirst(self::$path_array[0] ?? '');
-        $action = strtolower(self::$path_array[1] ?? '');
-        \SilangPHP\SilangPHP::$ct = $controller;
-        \SilangPHP\SilangPHP::$ac = $action;
-        unset(self::$path_array[0],self::$path_array[1]);
-        return self::load_controller($controller,$action,$middlewares);
+        if($vars)
+        {
+            self::$path_array = $vars;
+        }
+        return self::load_controller($controlstack,$action,$middlewares);
     }
 
     /**
@@ -121,21 +199,17 @@ class Route
      * @return bool|mixed
      * @throws \ReflectionException
      */
-    private static function load_controller($base, $action, $middlewares = []){
-        $dir = PS_APP_PATH . '/Controller/' . $base;
-        $file = $dir . 'Controller.php';
-        #echo join(', ', array($base, $action, $file)) . "\n";
+    private static function load_controller(array $controlstack = [], string $action = '',array $middlewares = []){
+        $file = PS_APP_PATH.'/Controller/'. implode("/",$controlstack).'Controller.php';
         if(file_exists($file)){
-            include($file);
-            $ps = explode('/', $base);
-            $controller = ucfirst($ps[count($ps) - 1]);
-            $cls = PS_APP_NAME.'\\Controller\\'. $controller . 'Controller';
+            include_once($file);
+            $cls = PS_APP_NAME.'\\Controller\\'. implode('\\',$controlstack) . 'Controller';
             if(!class_exists($cls)){
                 throw new \Exception("Controller $cls not found!");
             }
             $ins = new $cls();
-            $ins->request = SilangPHP::$request;
-            $ins->response = SilangPHP::$response;
+            $ins->request = SilangPHP::$app->request;
+            $ins->response = SilangPHP::$app->response;
             $found = false;
             if(method_exists($ins, $action)){
                 $ins->action = $action;
@@ -148,13 +222,17 @@ class Route
                 {
                     foreach($acParams as $acParam)
                     {
-                        $acParamClass = $acParam->getClass();
+                        $acParamClass = $acParam->getType() && !$acParam->getType()->isBuiltin()  ? new \ReflectionClass($acParam->getType()->getName()) : null;
                         if(!empty($acParamClass))
                         {
                             $paramClassName = $acParamClass->name;
                             $argsParam[] = Di::instance()->make($paramClassName);
                         }else{
-                            $argsParam[] = array_shift(self::$path_array);
+                            $pathtmp = array_shift(self::$path_array);
+                            if($pathtmp)
+                            {
+                                $argsParam[] = $pathtmp;
+                            } 
                         }
                     }
                 }
@@ -163,6 +241,7 @@ class Route
                 if(method_exists($ins,'beforeAction'))
                 {
                     $response = call_user_func_array(array($ins, 'beforeAction'), [$action]);
+                    // 有return会直接返回，避免die,exit的操作
                     if(!empty($response) && !is_bool($response))
                     {
                         return $response;
@@ -186,7 +265,7 @@ class Route
                         }
                     }
                 }
-                $response = $next(\SilangPHP\SilangPHP::$request);
+                $response = $next(\SilangPHP\SilangPHP::$app->request);
                 if(method_exists($ins,'afterAction'))
                 {
                     $response2 = call_user_func_array(array($ins, 'afterAction'), [$action, $response]);

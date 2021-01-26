@@ -22,6 +22,9 @@ use \SilangPHP\Config;
 use SilangPHP\Facade;
 use SilangPHP\SilangPHP;
 
+/**
+ * 最简单的mysql db类
+ */
 class Mysql
 {
     //数据库链接
@@ -80,7 +83,7 @@ class Mysql
             $lasttime = $endtime - $starttime;
             if (!$result) {
                 //调试模式才能显示 查看语句的时效
-                if(SilangPHP::$debug == 1)
+                if(SilangPHP::$app->debug == 1)
                 {
                     echo $sql.lr;
                     echo "sql_time:".$lasttime.lr;
@@ -89,7 +92,7 @@ class Mysql
             return $result;
         }catch(dbException $e)
         {
-            if(SilangPHP::$debug == 1)
+            if(SilangPHP::$app->debug == 1)
             {
                 Facade\Log::alert($e->getSql());
                 // echo $e->getSql();

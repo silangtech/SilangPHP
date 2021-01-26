@@ -29,8 +29,8 @@ class Controller
     public function __construct()
     {
         $this->is_ajax = $this->is_ajax();
-        $this->request = SilangPHP::$request;
-        $this->response = SilangPHP::$response;
+        $this->request = SilangPHP::$app->request;
+        $this->response = SilangPHP::$app->response;
     }
 
     /**

@@ -178,7 +178,7 @@ class File
         $this->_cache_fp = @fopen($this->_cache_file, 'rb+');
         
         if( !$this->_cache_fp ) {
-            throw new Exception ( "Cache file is not exists or no purview!" );
+            throw new \Exception ( "Cache file is not exists or no purview!" );
         }
         
         return $this->_cache_fp;

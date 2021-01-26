@@ -45,7 +45,6 @@ Class Cache{
      */
     public function __construct($type = '', $fileName = '' , $cache_time='3600')
     {
-//        self::$df_prefix  = PS_APP_NAME;
         self::$cache_time = $cache_time;
         if(empty($type))
         {

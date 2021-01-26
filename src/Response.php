@@ -17,11 +17,11 @@ declare(strict_types=1);
 namespace SilangPHP;
 class Response
 {
-
     public $header = [];
     public $body = '';
     // 状态码一般正确返回是200
     public $status = 200;
+    public $hander = null;
     public $httpCode = [
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -98,14 +98,27 @@ class Response
         // 直接设置header
         foreach($this->cors as $key=>$val)
         {
-            header($key.":".$val);
+            $this->header($key,$val);
         }
+    }
+
+    /**
+     * 设置头部
+     */
+    public function header($key, $value)
+    {
+        if(method_exists($this->hander,'end'))
+        {
+            $this->hander->header($key,$value);
+            return ;
+        }
+        header($key.":".$value);
     }
 
     /**
      * toJson
      */
-    public function toJson($result,$param = '')
+    public function toJson($result, $param = '')
     {
         return json_encode($result);
     }
@@ -114,7 +127,7 @@ class Response
      * headers
      * 输出json
      */
-    public function json($code=0,$msg='',$data='',$jsontype = JSON_UNESCAPED_UNICODE)
+    public function json($code=0, $msg='', $data='', $jsontype = JSON_UNESCAPED_UNICODE)
     {
         $result = $this->returnArray($code,$msg,$data);
         return json_encode($result,$jsontype);
@@ -123,18 +136,29 @@ class Response
     /**
      * 输出结尾
      */
-    public function end($result = '')
+    public function end($data = '')
     {
+        if($this->hander && method_exists($this->hander,'end'))
+        {
+            $this->hander->end($data);
+            return ;
+        }
         // 输出header与body
-        echo $result;
+        echo $data;
     }
 
     /**
      * 向客服端写入内容
      */
-    public function write($result)
+    public function write($data = '')
     {
-        $this->body .= $result;
+        if($this->hander && method_exists($this->hander,'write'))
+        {
+            $this->hander->write($data);
+            return ;
+        }
+        $this->body .= $data;
+        echo $data;
     }
 
     /**
@@ -143,6 +167,11 @@ class Response
      */
     public function send($data = '')
     {
+        if($this->hander && method_exists($this->hander,'send'))
+        {
+            $this->hander->send($data);
+            return ;
+        }
         if($data)
         {
             echo $data;
@@ -157,7 +186,7 @@ class Response
      * @param string $msg
      * @param string $data
      */
-    public function returnArray($code='0',$msg='',$data='')
+    public function returnArray($code='0', $msg='', $data='')
     {
         $result = array(
             'code' => $code,

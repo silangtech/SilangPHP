@@ -16,10 +16,12 @@
 declare(strict_types=1);
 namespace SilangPHP;
 
-use SilangPHP\Db\Medoo;
+// use SilangPHP\Db\Medoo;
 use SilangPHP\Exception\dbException;
+use Illuminate\Database\Eloquent\Model as Eloquent_Model;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
-class Model extends Medoo implements \ArrayAccess, \JsonSerializable
+class Model extends Eloquent_Model
 {
     //表格名
     public $table_name = "";
@@ -27,12 +29,14 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
     public $limit = 20;
     //指定数据库 又名connection
     public $database = 'master';
+    public $connection_name = '';
     //指定数据库名
     public $db_name = '';
     //当前页数
     public $page = 1;
     //主键
-    public $primary_key = 'id';
+    // primaryKey primary_key
+    public $primaryKey = 'id';
     //数据库类型，暂时只支持mysql
     public $db_type = 'mysql';
     //查询字段
@@ -46,17 +50,25 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
         try{
             //自动效验表格名
             $this->table();
-            $config = \SilangPHP\Config::get("Db.mysql")[$this->database];
-            $options = [
-                'database_type' => $this->db_type,  //'mysql',
-                'database_name' => !empty($this->db_name)?$this->db_name:$config['dbname'],
-                'server' => $config['host'],
-                'username' => $config['username'],
-                'password' => $config['password'],
-                'charset' => 'utf8',
-                'port' => $config['port'],
+            $this->connection_name = $this->database ?? $this->connection;
+            $config = \SilangPHP\Config::get("Db.mysql")[$this->connection_name];
+            $capsule = new Capsule;
+            $db_arr = [
+                'driver'    => $this->db_type ?? 'mysql',
+                'host'      => $config['host'],
+                'database'  => !empty($this->db_name)?$this->db_name:$config['dbname'],
+                'username'  => $config['username'],
+                'password'  => $config['password'],
+                'charset'   => 'utf8',
+                'collation' => 'utf8_general_ci',
+                'prefix'    => '',
             ];
-            parent::__construct($options);
+            $prikey = $this->primary_key ?? $this->primaryKey;
+            $this->setKeyName($prikey);
+            $capsule->addConnection($db_arr,$this->connection_name);
+            $capsule->setAsGlobal();
+            $capsule->bootEloquent();
+            parent::__construct();
             $this->conn_status = true;
         }catch(dbException $e)
         {
@@ -66,36 +78,6 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
             throw new \PDOException($e->getMessage());
         }
     }
-
-    public function offsetExists($offset)
-    {
-
-    }
-
-    public function offsetGet($offset)
-    {
-
-    }
-
-    public function offsetSet($offset, $value)
-    {
-
-    }
-
-    public function offsetUnset($offset)
-    {
-
-    }
-
-    public function jsonSerialize()
-    {
-
-    }
-
-//    public function create()
-//    {
-//        return new static();
-//    }
 
     public function __set($key,$value)
     {
@@ -112,15 +94,20 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
      * @return string
      */
     public function table($table_name = ''){
+        if(!empty($this->table))
+        {
+            $this->table_name = $this->table;
+        }
         if(!empty($table_name))
         {
             $this->table_name = $table_name;
         }
         if($this->table_name === ""){
             $table_name = get_called_class();
-            $table_name = str_replace(["mod_","Model"],"",$table_name);
+            $table_name = str_replace(["mod_","Model"], "", $table_name);
             $this->table_name = $table_name;
         }
+        $this->table = $this->table_name;
         return $this;
     }
 
@@ -129,7 +116,7 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
      */
     public function get_sql_one($sql)
     {
-        $data = $this->query($sql)->fetch(\PDO::FETCH_ASSOC);
+        $data = Capsule::connection($this->connection_name)->selectOne($sql)->toArray();
         return $data;
     }
 
@@ -138,7 +125,8 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
      */
     public function get_sql_all($sql)
     {
-        $data = $this->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+        $data = Capsule::connection($this->connection_name)->select($sql);
+        $data = json_decode(json_encode($data), true);
         return $data;
     }
 
@@ -149,7 +137,6 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
      */
     public function field($fields = '*')
     {
-
         $this->fields = $fields;
         $this->fields = explode(",",$this->fields);
         if(count($this->fields) == 1)
@@ -164,7 +151,7 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
      */
     public function get_one($where = [])
     {
-        $tmp = parent::get($this->table_name,$this->fields,$where);
+        $tmp = self::where($where)->first($this->fields)->toArray();
         $this->fields = '*';
         return $tmp;
     }
@@ -174,7 +161,8 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
      */
     public function get_all($where = [])
     {
-        $tmp = parent::select($this->table_name,$this->fields,$where);
+        // $tmp = parent::select($this->table_name,$this->fields,$where);
+        $tmp = self::where($where)->get($this->fields)->toArray();
         $this->fields = '*';
         return $tmp;
     }
@@ -188,7 +176,7 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
         $where['LIMIT'] = $limit;
         $data = $this->get_all($where);
         unset($where['LIMIT']);
-        $total = $this->count($this->table_name,$where);
+        $total = self::where($where)->count();
         return [
             'list' => $data,
             'total' => $total
@@ -205,17 +193,8 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
         {
             $attrs = $this->attr;
         }
-//        $tmp = parent::debug()->insert($this->table_name,$attrs);
-        $tmp = parent::insert($this->table_name,$attrs);
-        if($this->error()['0'] != '00000')
-        {
-            Facade\Log::alert(json_encode($this->error()));
-            //debug下打印一下
-            return false;
-        }else{
-            $insert_id = $this->id();
-        }
-        return $insert_id;
+        $tmp = self::insert($attrs);
+        return $tmp;
     }
 
     /**
@@ -224,12 +203,13 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
      */
     public function update1($attrs,$where){
         //这个里where
-        $data = parent::update($this->table_name,$attrs,$where);
+        $data = self::where($where)->update($attrs);
         if($data == false)
         {
             return false;
         }
-        return  $data->rowCount();
+        return $data;
+        // return  $data->rowCount();
     }
 
     /**
@@ -238,7 +218,7 @@ class Model extends Medoo implements \ArrayAccess, \JsonSerializable
      * @param $id
      */
     public function delete1($id){
-        parent::delete($this->table_name,['id'=>$id]);
+        parent::where(['id'=>$id])->delete();
     }
 
     /**

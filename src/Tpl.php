@@ -57,10 +57,16 @@ class Tpl
      */
     public static function display($file_name = '')
     {
-        ob_start();
-        extract(self::$tpl_result);
-        include self::include_file($file_name);
-        ob_flush();
+        \extract(self::$tpl_result);
+        \ob_start();
+        try {
+            include self::include_file($file_name);
+            // ob_flush();
+        } catch (\Throwable $e) {
+            echo $e;
+        }
         self::$tpl_result = ['phpshow'=>'SilangPHP'];
+        return \ob_get_clean();
+
     }
 }

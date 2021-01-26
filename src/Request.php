@@ -20,9 +20,6 @@ class Request
     // 用户的cookie
     public $cookies = [];
 
-    // 把GET、POST的变量合并一块，相当于 _REQUEST 表单提交
-    public $forms = [];
-
     // _GET 变量
     public $gets = [];
 
@@ -35,9 +32,13 @@ class Request
 
     public $method = 'GET';
 
-    public $request;
+    public $files;
 
-    private $mode = 0;
+    public $raw = '';
+
+    public $request;
+    
+    public $hander = null;
 
     public function __construct()
     {
@@ -48,6 +49,7 @@ class Request
             $this->server = $_SERVER ?? [];
             $this->cookies = $_COOKIE ?? [];
             $this->request = $_REQUEST ?? [];
+            $this->raw = file_get_contents("php://input") ?? '';
         }
         // 跑取获得的header
         foreach ($_SERVER as $key => $val) {
@@ -59,12 +61,12 @@ class Request
                 $this->header[$key] = $val;
             }
         }
-        $this->method = $this->server['REQUEST_METHOD'];
+        // $this->method = $this->server['REQUEST_METHOD'];
     }
 
     public function isAjax()
     {
-        return $this->header("X-Requested-With") === "XMLHttpRequest";
+        return $this->header["X-Requested-With"] === "XMLHttpRequest";
     }
 
     /**
@@ -110,11 +112,7 @@ class Request
      */
     public function getRaw()
     {
-        if($this->mode == 0)
-        {
-            return file_get_contents("php://input");
-        }
-        return '';
+        return $this->raw;
     }
 
     /**

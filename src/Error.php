@@ -50,7 +50,7 @@ Class Error
     /**
      * 错误接管函数
      */
-    public static function handler_debug_error($errno, $errmsg, $filename, $linenum, $vars)
+    public static function handler_debug_error($errno, $errmsg, $filename, $linenum, $vars = [])
     {
         if(\SilangPHP\Config::get('Site.debug') == 1)
         {
@@ -74,13 +74,18 @@ Class Error
         $linenum   = $e->getLine();
         $filename  = $e->getFile();
         $backtrace = $e->getTrace();
+        // echo '1'.$errno.lr;
+        // echo '2'.$errmsg.lr;
+        // echo '3'.$linenum.lr;
+        // echo '4'.$filename.lr;
+        // echo '5'.$backtrace.lr;
         self::handler_debug_error($errno, $errmsg, $filename, $linenum, $backtrace);
     }
 
     /**
      * 格式化错误信息
      */
-    public static function debug_format_errmsg($log_type='debug', $errno, $errmsg, $filename, $linenum, $vars)
+    public static function debug_format_errmsg($log_type, $errno, $errmsg, $filename, $linenum, $vars)
     {
         $user_errors = array(E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE);
         //处理从 catch 过来的错误
@@ -181,8 +186,12 @@ Class Error
         }
         $err .= $log_type=='debug' ? "</div>\n" : "------------------------------------------\n";
         // 直接输出就ok了
-        echo $err;
-//        return $err;
+        if(\SilangPHP\SilangPHP::$app->response)
+        {
+            \SilangPHP\SilangPHP::$app->response->write($err);
+        }else{
+            echo $err;
+        }
     }
 
 
@@ -194,7 +203,7 @@ Class Error
      */
     public static function show_debug_error()
     {
-        if(\SilangPHP\Config('Site.debug') == 0)
+        if(\SilangPHP\Config::get('Site.debug') == 0)
         {
             return '';
         }
@@ -228,13 +237,13 @@ Class Error
      */
     public static function fatal_handler()
     {
-        if(SilangPHP::$endTime == '')
+        if(SilangPHP::$app->endTime == '')
         {
-            SilangPHP::$endTime = microtime(true);
+            SilangPHP::$app->endTime = microtime(true);
         }
-        $caltime = SilangPHP::$endTime - SilangPHP::$startTime;
+        // $caltime = SilangPHP::$app->endTime - SilangPHP::$app->startTime;
         // 非ajax请求可输出
-        if(SilangPHP::$debug == 1)
+        if(SilangPHP::$app->debug == 1)
         {
 //            echo $caltime;
         }

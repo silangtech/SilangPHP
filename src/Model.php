@@ -50,12 +50,13 @@ class Model extends Eloquent_Model
         try{
             //自动效验表格名
             $this->table();
-            $this->connection = $this->connection_name = $this->database ?? $this->connection;
+            $this->connection = $this->connection_name = $this->connection ?? $this->database;
             $config = \SilangPHP\Config::get("Db.mysql")[$this->connection_name];
             $capsule = new Capsule;
             $db_arr = [
                 'driver'    => $this->db_type ?? 'mysql',
                 'host'      => $config['host'],
+                'port'      => $config['port'],
                 'database'  => !empty($this->db_name)?$this->db_name:$config['dbname'],
                 'username'  => $config['username'],
                 'password'  => $config['password'],

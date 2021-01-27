@@ -116,7 +116,8 @@ class Model extends Eloquent_Model
      */
     public function get_sql_one($sql)
     {
-        $data = Capsule::connection($this->connection_name)->selectOne($sql)->toArray();
+        $data = Capsule::connection($this->connection_name)->selectOne($sql);
+        $data = json_decode(json_encode($data), true);
         return $data;
     }
 

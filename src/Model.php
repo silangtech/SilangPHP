@@ -50,7 +50,7 @@ class Model extends Eloquent_Model
         try{
             //自动效验表格名
             $this->table();
-            $this->connection_name = $this->database ?? $this->connection;
+            $this->connection = $this->connection_name = $this->database ?? $this->connection;
             $config = \SilangPHP\Config::get("Db.mysql")[$this->connection_name];
             $capsule = new Capsule;
             $db_arr = [
@@ -152,8 +152,12 @@ class Model extends Eloquent_Model
      */
     public function get_one($where = [])
     {
-        $tmp = self::where($where)->first($this->fields)->toArray();
+        $tmp = self::where($where)->first($this->fields);
         $this->fields = '*';
+        if($tmp)
+        {
+            $tmp->toArray();
+        }
         return $tmp;
     }
 
@@ -163,8 +167,12 @@ class Model extends Eloquent_Model
     public function get_all($where = [])
     {
         // $tmp = parent::select($this->table_name,$this->fields,$where);
-        $tmp = self::where($where)->get($this->fields)->toArray();
+        $tmp = self::where($where)->get($this->fields);
         $this->fields = '*';
+        if($tmp)
+        {
+            $tmp->toArray();
+        }
         return $tmp;
     }
 

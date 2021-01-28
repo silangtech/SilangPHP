@@ -15,6 +15,9 @@
 */
 declare(strict_types=1);
 namespace SilangPHP;
+use Illuminate\Database\Capsule\Manager as Capsule;
+// use Illuminate\Events\Dispatcher;
+// use Illuminate\Container\Container;
 
 /**
  * Class SilangPHP
@@ -28,6 +31,7 @@ final Class SilangPHP
     // 默认运行模式
     public static $mode = 0;
     public static $cache = [];
+    public static $db = null;
 
     /**
      * 获取临时缓存
@@ -66,6 +70,31 @@ final Class SilangPHP
         define("PS_APP_NAME",        $appName);
         define("PS_CONFIG_PATH",     PS_ROOT_PATH."/Config/");
         define("PS_RUNTIME_PATH",	 PS_ROOT_PATH."/Runtime/");
+
+        $dbconfig = \SilangPHP\Config::get("Db.mysql");
+        if($dbconfig)
+        {
+            self::$db = new Capsule;
+            foreach($dbconfig as $connection_name => $config)
+            {
+                $db_arr = [
+                    'driver'    => $config['dbtype'] ?? 'mysql', 
+                    'host'      => $config['host'],
+                    'port'      => $config['port'],
+                    'database'  => $config['dbname'],
+                    'username'  => $config['username'],
+                    'password'  => $config['password'],
+                    'charset'   => 'utf8',
+                    'collation' => 'utf8_general_ci',
+                    'prefix'    => '',
+                ];
+                self::$db->addConnection($db_arr,$connection_name);
+            }
+            // self::$db->setEventDispatcher(new Dispatcher(new Container));
+            self::$db->setFetchMode(\PDO::FETCH_ASSOC);
+            self::$db->setAsGlobal();
+            self::$db->bootEloquent();
+        }
         self::$mode = \SilangPHP\Config::get("Site.mode");
         switch(self::$mode)
         {

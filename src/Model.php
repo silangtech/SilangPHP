@@ -20,6 +20,8 @@ namespace SilangPHP;
 use SilangPHP\Exception\dbException;
 use Illuminate\Database\Eloquent\Model as Eloquent_Model;
 use Illuminate\Database\Capsule\Manager as Capsule;
+// use Illuminate\Events\Dispatcher;
+// use Illuminate\Container\Container;
 
 class Model extends Eloquent_Model
 {
@@ -28,7 +30,7 @@ class Model extends Eloquent_Model
     //每页条数
     public $limit = 20;
     //指定数据库 又名connection
-    public $database = 'master';
+    public $database = '';
     public $connection_name = '';
     //指定数据库名
     public $db_name = '';
@@ -51,31 +53,14 @@ class Model extends Eloquent_Model
             //自动效验表格名
             $this->table();
             $this->connection = $this->connection_name = $this->connection ?? $this->database;
-            $config = \SilangPHP\Config::get("Db.mysql")[$this->connection_name];
-            $capsule = new Capsule;
-            $db_arr = [
-                'driver'    => $this->db_type ?? 'mysql',
-                'host'      => $config['host'],
-                'port'      => $config['port'],
-                'database'  => !empty($this->db_name)?$this->db_name:$config['dbname'],
-                'username'  => $config['username'],
-                'password'  => $config['password'],
-                'charset'   => 'utf8',
-                'collation' => 'utf8_general_ci',
-                'prefix'    => '',
-            ];
             $prikey = $this->primary_key ?? $this->primaryKey;
             $this->setKeyName($prikey);
-            $capsule->addConnection($db_arr,$this->connection_name);
-            $capsule->setAsGlobal();
-            $capsule->bootEloquent();
             parent::__construct();
             $this->conn_status = true;
         }catch(dbException $e)
         {
             $this->conn_status = false;
             Facade\Log::alert("数据库链接失败".$e->getSql()."|".$e->getMessage());
-//            echo $e->getSql();
             throw new \PDOException($e->getMessage());
         }
     }
@@ -153,11 +138,11 @@ class Model extends Eloquent_Model
      */
     public function get_one($where = [])
     {
-        $tmp = self::where($where)->first($this->fields);
+        $tmp = self::where($where)->select($this->fields)->first();
         $this->fields = '*';
         if($tmp)
         {
-            $tmp->toArray();
+            $tmp = $tmp->toArray();
         }
         return $tmp;
     }
@@ -168,11 +153,11 @@ class Model extends Eloquent_Model
     public function get_all($where = [])
     {
         // $tmp = parent::select($this->table_name,$this->fields,$where);
-        $tmp = self::where($where)->get($this->fields);
+        $tmp = self::where($where)->select($this->fields)->get();
         $this->fields = '*';
         if($tmp)
         {
-            $tmp->toArray();
+            $tmp = $tmp->toArray();
         }
         return $tmp;
     }
@@ -203,6 +188,7 @@ class Model extends Eloquent_Model
         {
             $attrs = $this->attr;
         }
+        // insertGetId
         $tmp = self::insert($attrs);
         return $tmp;
     }
@@ -214,14 +200,10 @@ class Model extends Eloquent_Model
     public function update1($attrs,$where){
         //这个里where
         $data = self::where($where)->update($attrs);
-        if($data == false)
-        {
-            return false;
-        }
         return $data;
         // return  $data->rowCount();
     }
-	
+    
 	/**
      * 执行sql
      * @param $attrs
@@ -238,7 +220,7 @@ class Model extends Eloquent_Model
      * @param $id
      */
     public function delete1($id){
-        parent::where(['id'=>$id])->delete();
+        self::where(['id'=>$id])->delete();
     }
 
     /**

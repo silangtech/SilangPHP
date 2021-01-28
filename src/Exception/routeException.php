@@ -26,6 +26,6 @@ Class routeException extends \Exception
 {
     public function __construct($message = "", $code = 0, Throwable $previous = null) {
 
-        \SilangPHP\Facade\Log::error(json_encode(SilangPHP::$request).$message);
+        \SilangPHP\Facade\Log::error(json_encode(SilangPHP::$app->request).$message);
     }
 }

@@ -200,10 +200,11 @@ class Route extends \FastRoute\Route
      * @throws \ReflectionException
      */
     private static function load_controller(array $controlstack = [], string $action = '',array $middlewares = []){
-        $file = PS_APP_PATH.'/Controller/'. implode("/",$controlstack).'Controller.php';
+        $cts = implode("/",$controlstack);
+        $file = PS_APP_PATH.'/Controller/'. $cts.'Controller.php';
         if(file_exists($file)){
             include_once($file);
-            $cls = PS_APP_NAME.'\\Controller\\'. implode('\\',$controlstack) . 'Controller';
+            $cls = PS_APP_NAME.'\\Controller\\'. $cts . 'Controller';
             if(!class_exists($cls)){
                 throw new \Exception("Controller $cls not found!");
             }
@@ -213,6 +214,8 @@ class Route extends \FastRoute\Route
             $found = false;
             if(method_exists($ins, $action)){
                 $ins->action = $action;
+                SilangPHP::$app->ct = $cts;
+                SilangPHP::$app->ac = $action;
                 $found = true;
                 $ctlRef = new \ReflectionClass($cls);
                 $acRef = $ctlRef->getMethod($action);

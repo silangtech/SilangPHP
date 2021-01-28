@@ -221,6 +221,16 @@ class Model extends Eloquent_Model
         return $data;
         // return  $data->rowCount();
     }
+	
+	/**
+     * 执行sql
+     * @param $attrs
+     */
+    public function query1($sql)
+    {
+        $result = Capsule::connection($this->connection_name)->statement($sql);
+        return $result;
+    }
 
     /**
      * 删除数据

@@ -201,10 +201,11 @@ class Route extends \FastRoute\Route
      */
     private static function load_controller(array $controlstack = [], string $action = '',array $middlewares = []){
         $cts = implode("/",$controlstack);
+        $cts2 = implode("\\",$controlstack);
         $file = PS_APP_PATH.'/Controller/'. $cts.'Controller.php';
         if(file_exists($file)){
             include_once($file);
-            $cls = PS_APP_NAME.'\\Controller\\'. $cts . 'Controller';
+            $cls = PS_APP_NAME.'\\Controller\\'. $cts2 . 'Controller';
             if(!class_exists($cls)){
                 throw new \Exception("Controller $cls not found!");
             }

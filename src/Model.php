@@ -188,8 +188,8 @@ class Model extends Eloquent_Model
         {
             $attrs = $this->attr;
         }
-        // insertGetId
-        $tmp = self::insert($attrs);
+        // insertGetId | insert
+        $tmp = self::insertGetId($attrs);
         return $tmp;
     }
 

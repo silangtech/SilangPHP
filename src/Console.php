@@ -40,7 +40,7 @@ Class Console{
     /**
      * 运行Command
      */
-    public static function start($action='',$input='',$usergroup=[])
+    public static function start($action='', $input='', $usergroup=[])
     {
         self::changeUser($usergroup);
         echo self::$welcome;
@@ -111,10 +111,14 @@ Class Console{
         }
         $cmd = trim($cmd);
         $args = explode("&",$cmd);
+        $argv = [];
         foreach($args as $val)
         {
             $tmp = explode("=",$val);
-            $argv[$tmp[0]] = $tmp[1];
+            if(isset($tmp[1]))
+            {
+                $argv[$tmp[0]] = $tmp[1];
+            }
         }
         return $argv;
     }

@@ -137,7 +137,7 @@ class Route extends \FastRoute\Route
         }
     }
 
-    public static function found($path,$method,$vars = [])
+    public static function found($path, $method, $vars = [])
     {
         $path = trim($path,"/");
         self::load_rule();
@@ -169,6 +169,7 @@ class Route extends \FastRoute\Route
         self::$path_array = preg_split("/[\/]/",$path,-1,\PREG_SPLIT_NO_EMPTY);
         $controllerpath = PS_APP_PATH.'/Controller/';
         $controlstack = [];
+        $action = SilangPHP::$app->ac;
         foreach(self::$path_array as $searchkey => $searchpath)
         {
             $controllerpath2 = $controllerpath.ucfirst($searchpath).'/';
@@ -181,7 +182,7 @@ class Route extends \FastRoute\Route
                 $controller = ucfirst($searchpath);
                 array_push($controlstack,$controller);
                 unset(self::$path_array[$searchkey]);
-                $action = isset(self::$path_array[$searchkey+1]) ? self::$path_array[$searchkey+1] : '';
+                $action = isset(self::$path_array[$searchkey+1]) ? self::$path_array[$searchkey+1] : $action;
                 unset(self::$path_array[$searchkey + 1]);
                 break;
             }

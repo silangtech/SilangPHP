@@ -18,6 +18,7 @@ namespace SilangPHP;
 
 // use SilangPHP\Db\Medoo;
 use SilangPHP\Exception\dbException;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\Model as Eloquent_Model;
 use Illuminate\Database\Capsule\Manager as Capsule;
 // use Illuminate\Events\Dispatcher;
@@ -46,7 +47,7 @@ class Model extends Eloquent_Model
     //表格数据
     public $attr;
     public $conn_status = false;
-
+    public $timestamps = false;
     public function __construct()
     {
         try{
@@ -97,14 +98,28 @@ class Model extends Eloquent_Model
         return $this;
     }
 
+    public function recordError($e)
+    {
+        $sql = $e->getSql();
+        $message = $e->getMessage();
+        \file_put_contents(PS_RUNTIME_PATH.'/sqlerror.txt',"sql:".$sql."|message:".$message."\r\n",FILE_APPEND|LOCK_EX);
+        throw $e;
+    }
+
+
     /**
      * 获取指定sql一条数据
      */
     public function get_sql_one($sql)
     {
-        $data = Capsule::connection($this->connection_name)->selectOne($sql);
-        $data = json_decode(json_encode($data), true);
-        return $data;
+        try{
+            $data = Capsule::connection($this->connection_name)->selectOne($sql);
+            $data = json_decode(json_encode($data), true);
+            return $data;
+        }catch (QueryException $e) {
+            $this->recordError($e);
+            return false;
+        }
     }
 
     /**
@@ -112,9 +127,14 @@ class Model extends Eloquent_Model
      */
     public function get_sql_all($sql)
     {
-        $data = Capsule::connection($this->connection_name)->select($sql);
-        $data = json_decode(json_encode($data), true);
-        return $data;
+        try{
+            $data = Capsule::connection($this->connection_name)->select($sql);
+            $data = json_decode(json_encode($data), true);
+            return $data;
+        }catch (QueryException $e) {
+            $this->recordError($e);
+            return false;
+        }
     }
 
     /**
@@ -137,14 +157,20 @@ class Model extends Eloquent_Model
      * get_one
      */
     public function get_one($where = [])
-    {
-        $tmp = self::where($where)->select($this->fields)->first();
-        $this->fields = '*';
-        if($tmp)
-        {
-            $tmp = $tmp->toArray();
-        }
-        return $tmp;
+    {   
+        try{
+            $tmp = self::where($where)->select($this->fields)->first();
+            $this->fields = '*';
+            if($tmp)
+            {
+                $tmp = $tmp->toArray();
+            }
+            return $tmp;
+        }catch (QueryException $e) {
+            $this->recordError($e);
+            return false;
+        }                                              
+        
     }
 
     /**
@@ -152,14 +178,19 @@ class Model extends Eloquent_Model
      */
     public function get_all($where = [])
     {
-        // $tmp = parent::select($this->table_name,$this->fields,$where);
-        $tmp = self::where($where)->select($this->fields)->get();
-        $this->fields = '*';
-        if($tmp)
-        {
-            $tmp = $tmp->toArray();
+        try{
+            // $tmp = parent::select($this->table_name,$this->fields,$where);
+            $tmp = self::where($where)->select($this->fields)->get();
+            $this->fields = '*';
+            if($tmp)
+            {
+                $tmp = $tmp->toArray();
+            }
+            return $tmp;
+        }catch (QueryException $e) {
+            $this->recordError($e);
+            return false;
         }
-        return $tmp;
     }
 
     /**
@@ -188,9 +219,14 @@ class Model extends Eloquent_Model
         {
             $attrs = $this->attr;
         }
-        // insertGetId | insert
-        $tmp = self::insertGetId($attrs);
-        return $tmp;
+        try{
+            // insertGetId | insert
+            $tmp = self::insertGetId($attrs);
+            return $tmp;
+        }catch (QueryException $e) {
+            $this->recordError($e);
+            return false;
+        }
     }
 
     /**
@@ -198,10 +234,15 @@ class Model extends Eloquent_Model
      * @param $attrs
      */
     public function update1($attrs,$where){
-        //这个里where
-        $data = self::where($where)->update($attrs);
-        return $data;
-        // return  $data->rowCount();
+        try{
+            //这个里where
+            $data = self::where($where)->update($attrs);
+            return $data;
+            // return  $data->rowCount();
+        }catch (QueryException $e) {
+            $this->recordError($e);
+            return false;
+        }
     }
     
 	/**
@@ -210,8 +251,14 @@ class Model extends Eloquent_Model
      */
     public function query1($sql)
     {
-        $result = Capsule::connection($this->connection_name)->statement($sql);
-        return $result;
+        try{
+            $result = Capsule::connection($this->connection_name)->statement($sql);
+            return $result;
+        }catch (QueryException $e) {
+            $this->recordError($e);
+            return false;
+        }
+        
     }
 
     /**
@@ -220,7 +267,14 @@ class Model extends Eloquent_Model
      * @param $id
      */
     public function delete1($id){
-        self::where(['id'=>$id])->delete();
+        try{
+            $status = self::where(['id'=>$id])->delete();
+            return $status;
+        }catch (QueryException $e) {
+            $this->recordError($e);
+            throw $e;
+        }
+        
     }
 
     /**

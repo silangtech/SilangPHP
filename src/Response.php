@@ -96,7 +96,7 @@ class Response
         ];
         if($host != '*')
         {
-            $this->cors['Access-Control-Allow-Credentials'] = true;
+            $this->cors['Access-Control-Allow-Credentials'] = "true";
         }else{
             unset($this->cors['Access-Control-Allow-Credentials']);
         }

@@ -94,6 +94,12 @@ class Response
             // uc浏览器windows版如果Access-Control-Allow-Headers 使用 * 是有问题的
             'Access-Control-Allow-Headers' => 'Accept,AUTHORIZATION,DNT,X-Token,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization',
         ];
+        if($host != '*')
+        {
+            $this->cors['Access-Control-Allow-Credentials'] = true;
+        }else{
+            unset($this->cors['Access-Control-Allow-Credentials']);
+        }
 
         // 直接设置header
         foreach($this->cors as $key=>$val)

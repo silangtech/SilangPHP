@@ -39,7 +39,7 @@ class JwtMiddleware
         if(empty($auth_data))
         {
             // 调试先关闭
-            return \SilangPHP\SilangPHP::$response->json(-1,'token校验异常');
+            return \SilangPHP\SilangPHP::$app->response->json(-1,'token校验异常');
         }
         $request->auth_data = $auth_data;
         $response = $next($request);

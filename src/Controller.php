@@ -119,7 +119,7 @@ class Controller
      * 默认生成swagger api文档
      * @return mixed
      */
-    protected function doc0221()
+    public function doc0221()
     {
         try{
             $openapi = \OpenApi\scan(PS_APP_PATH.'/Controller');

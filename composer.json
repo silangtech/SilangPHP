@@ -19,6 +19,9 @@
         "workerman/workerman": "4.0.18",
         "nesbot/carbon": "2.31"
     },
+    "require-dev": {
+        "zircote/swagger-php": "3.1.0"
+    },
     "repositories": {
         "packagist": {
             "type": "composer",

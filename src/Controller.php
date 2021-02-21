@@ -115,4 +115,23 @@ class Controller
         return $this->response->json($code,$msg);
     }
 
+    /**
+     * 默认生成swagger api文档
+     * @return mixed
+     */
+    protected function doc0221()
+    {
+        try{
+            $openapi = \OpenApi\scan(PS_APP_PATH.'/Controller');
+            $json_file = PS_ROOT_PATH.'/Public/docswagger.json';
+            file_put_contents($json_file,$openapi->toJson());
+            $this->response->send('写入docswagger.json成功');
+            return true;
+        }catch(\Exception $e)
+        {
+            $this->response->send('写入docswagger.json失败:'.$e->getMessage());
+            return false;
+        }
+    }
+
 }

@@ -71,6 +71,11 @@ final Class SilangPHP
         define("PS_CONFIG_PATH",     PS_ROOT_PATH."/Config/");
         define("PS_RUNTIME_PATH",	 PS_ROOT_PATH."/Runtime/");
 
+        if(file_exists(PS_CONFIG_PATH.'/define.php'))
+        {
+            require_once(PS_CONFIG_PATH.'/define.php');
+        }
+
         $dbconfig = \SilangPHP\Config::get("Db.mysql");
         if($dbconfig)
         {

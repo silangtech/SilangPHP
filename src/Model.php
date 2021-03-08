@@ -48,7 +48,7 @@ class Model extends Eloquent_Model
     public $attr;
     public $conn_status = false;
     public $timestamps = false;
-    public function __construct()
+    public function __construct(array $attributes = [])
     {
         try{
             //自动效验表格名
@@ -56,7 +56,7 @@ class Model extends Eloquent_Model
             $this->connection = $this->connection_name = $this->connection ?? $this->database;
             $prikey = $this->primary_key ?? $this->primaryKey;
             $this->setKeyName($prikey);
-            parent::__construct();
+            parent::__construct($attributes);
             $this->conn_status = true;
         }catch(dbException $e)
         {

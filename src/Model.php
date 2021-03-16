@@ -66,16 +66,6 @@ class Model extends Eloquent_Model
         }
     }
 
-    public function __set($key,$value)
-    {
-        $this->attr[$key] = $value;
-    }
-
-    public function __get($key)
-    {
-        return $this->attr[$key];
-    }
-
     /**
      * 数据库名
      * @return string

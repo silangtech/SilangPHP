@@ -15,6 +15,8 @@
 */
 declare(strict_types=1);
 namespace SilangPHP;
+
+
 class Request
 {
     // 用户的cookie
@@ -38,6 +40,8 @@ class Request
 
     public $request;
     
+    public $validator = null;
+
     public $hander = null;
 
     public function __construct()
@@ -67,6 +71,36 @@ class Request
     public function isAjax()
     {
         return $this->header["X-Requested-With"] === "XMLHttpRequest";
+    }
+
+    /**
+     * 校验数据
+     * 默认返回错误码为11000
+     * 
+     * @param array $input
+     * @param [type] $rules
+     * @param integer $erorcode
+     * @return void
+     */
+    public function validate($input = [], $rules ,$code = 11000)
+    {
+        // $translationPath = PS_RUNTIME_PATH.'/lang';
+        if(empty($this->validator))
+        {
+            $translationLocale = 'en';
+            $translationPath = '';
+            $transFileLoader = new \Illuminate\Translation\FileLoader(new \Illuminate\Filesystem\Filesystem, $translationPath);
+            $translator = new \Illuminate\Translation\Translator($transFileLoader, $translationLocale);
+            $this->validator = new \Illuminate\Validation\Factory($translator);
+        }
+        // $validator = \Illuminate\Support\Facades\Validator::make($input, $rules);
+        $validator = $this->validator->make($input, $rules);
+        if ($validator->fails()) {
+            $message = $validator->messages();
+            // $errors = $validator->errors();
+            $fail =  \SilangPHP\SilangPHP::$app->response->json($code, 'error', $message);
+            throw new \Exception($fail, $code);
+        }
     }
 
     /**

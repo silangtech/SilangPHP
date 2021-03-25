@@ -130,7 +130,14 @@ final Class SilangPHP
     {
         if(is_object(self::$app))
         {
-            self::$app->run($pathinfo);
+            try{
+                $result = self::$app->run($pathinfo);
+            }catch(\Exception $e)
+            {
+                $result = $e->getMessage();
+                self::$app->response->end($result);
+            }
+            return $result;
         }
     }
 }

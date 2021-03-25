@@ -14,8 +14,10 @@
         "php": ">=7.1.0",
         "guzzlehttp/guzzle": "6.3",
         "silangtech/util": "dev-master",
-        "nikic/fast-route": "1.3.0",
-        "illuminate/database": "8.22.1",
+        "silangtech/jwt": "dev-master",
+        "nikic/fast-route": "v1.3.0",
+        "illuminate/database": "v8.24.0",
+        "illuminate/validation": "v8.24.0",
         "workerman/workerman": "4.0.18",
         "nesbot/carbon": "2.31"
     },

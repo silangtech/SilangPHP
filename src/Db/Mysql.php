@@ -66,7 +66,7 @@ class Mysql
      * 执行mysql处理
      * @param $sql
      */
-    public function query($sql)
+    public function query(string $sql = '')
     {
         $result = '';
         try{
@@ -104,7 +104,7 @@ class Mysql
     /**
      * 获取单个数据
      */
-    public function get_one($sql)
+    public function get_one(string $sql = '')
     {
         $row = false;
         if(!strpos($sql,'limit'))
@@ -123,7 +123,7 @@ class Mysql
     /**
      * 获取所有数据
      */
-    public function get_all($sql)
+    public function get_all(string $sql = '')
     {
         $result = $this->query($sql);
         if($result)
@@ -138,7 +138,7 @@ class Mysql
      * @param $sql
      * @return \Generator
      */
-    public function get_big_all($sql)
+    public function get_big_all(string $sql = '')
     {
         $result = $this->query($sql);
         while($row=$result->fetch($result,\PDO::FETCH_ASSOC)) {

@@ -25,7 +25,7 @@ class Di
      * @param $abstract
      * @param $concrete
      */
-    public function set(String $abstract,$concrete){
+    public function set(String $abstract, $concrete){
         self::$container[$abstract] = $concrete;
     }
 

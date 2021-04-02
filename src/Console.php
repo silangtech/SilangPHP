@@ -40,7 +40,7 @@ Class Console{
     /**
      * 运行Command
      */
-    public static function start($action='', $input='', $usergroup=[])
+    public static function start($action = '', $input='', $usergroup = [])
     {
         self::changeUser($usergroup);
         echo self::$welcome;

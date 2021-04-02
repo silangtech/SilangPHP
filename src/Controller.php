@@ -58,7 +58,7 @@ class Controller
         $config = \SilangPHP\Config::get('Middleware');
         if($config)
         {
-            foreach($config as $key=>$val)
+            foreach($config as $key=> $val)
             {
                 $this->middlewares[] = $val;
             }
@@ -70,7 +70,7 @@ class Controller
     /**
      * 排除某方法之后调用中间件
      */
-    public function except(Array $action)
+    public function except(Array $action = [])
     {
         $this->exceptAction = $action;
         return true;
@@ -99,7 +99,7 @@ class Controller
      * @param string $msg
      * @return mixed
      */
-    public function success($msg = '',$data = '')
+    public function success($msg = '', $data = '')
     {
         return $this->response->json(0,$msg,$data);
     }
@@ -110,9 +110,9 @@ class Controller
      * @param string $msg
      * @return mixed
      */
-    public function fail($code = -1,$msg = '')
+    public function fail($code = -1, $msg = '')
     {
-        return $this->response->json($code,$msg);
+        return $this->response->json($code, $msg);
     }
 
     /**

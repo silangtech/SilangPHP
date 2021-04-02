@@ -21,6 +21,7 @@ use SilangPHP\Cache;
 //要确保有session的文件夹，不然session将会失效
 /**
  * session接口类
+ * @todo 这个fpm模式下的session管理会废弃
  */
 class SessionHandler
 {

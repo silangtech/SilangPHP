@@ -112,12 +112,15 @@ class Response
     /**
      * 设置头部
      */
-    public function header($key, $value)
+    public function header($key, $value = '')
     {
-        if(method_exists($this->hander,'end'))
+        if($this->hander)
         {
-            $this->hander->header($key,$value);
-            return ;
+            if(method_exists($this->hander,'header'))
+            {
+                $this->hander->header($key,$value);
+                return ;
+            }
         }
         header($key.":".$value);
     }
@@ -145,9 +148,12 @@ class Response
      */
     public function end($data = '')
     {
-        if($this->hander && method_exists($this->hander,'end'))
+        if(is_object($this->hander))
         {
-            $this->hander->end($data);
+            if(method_exists($this->hander,'end'))
+            {
+                $this->hander->end($data);
+            }
             return ;
         }
         // 输出header与body
@@ -159,9 +165,12 @@ class Response
      */
     public function write($data = '')
     {
-        if($this->hander && method_exists($this->hander,'write'))
+        if($this->hander)
         {
-            $this->hander->write($data);
+            if(method_exists($this->hander,'write'))
+            {
+                $this->hander->write($data);
+            }
             return ;
         }
         $this->body .= $data;
@@ -174,9 +183,12 @@ class Response
      */
     public function send($data = '')
     {
-        if($this->hander && method_exists($this->hander,'send'))
+        if($this->hander)
         {
-            $this->hander->send($data);
+            if(method_exists($this->hander,'send'))
+            {
+                $this->hander->send($data);
+            }
             return ;
         }
         if($data)

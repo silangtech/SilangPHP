@@ -48,7 +48,7 @@ Class Cache{
         self::$cache_time = $cache_time;
         if(empty($type))
         {
-            self::$cache_type = \SilangPHP\SilangPHP::$cacheType;
+            self::$cache_type = \SilangPHP\SilangPHP::$app->cacheType;
         }else{
             self::$cache_type = $type;
         }

@@ -26,7 +26,7 @@ Class Config
      * 初始化配置
      * 先要引进文件
      */
-    public static function include($filename='',$reload=false):void
+    public static function include($filename = '',$reload = false):void
     {
         if(!empty($filename))
         {
@@ -113,7 +113,7 @@ Class Config
      * 代码自动生成数据配置
      * Config::set("database.mysql.dbname","phpshow");
      */
-    public static function set($key,$value):void
+    public static function set($key, $value):void
     {
         $keys = explode(".",$key);
         $count = count($keys);

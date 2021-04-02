@@ -82,7 +82,7 @@ class Request
      * @param integer $erorcode
      * @return void
      */
-    public function validate($input = [], $rules ,$code = 11000)
+    public function validate($input = [],array $rules =[] ,$code = 11000)
     {
         // $translationPath = PS_RUNTIME_PATH.'/lang';
         if(empty($this->validator))

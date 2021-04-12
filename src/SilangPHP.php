@@ -113,7 +113,7 @@ final Class SilangPHP
                 self::$app = new \SilangPHP\Httpmode\Appswoole();
                 break;
             case 3:
-                self::$app = new \SilangPHP\Httpmode\Appswoole();
+                self::$app = new \SilangPHP\Httpmode\AppswooleCo();
                 break;
             default:
                 echo 'app error!';

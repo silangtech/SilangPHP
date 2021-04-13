@@ -30,6 +30,7 @@ final Class SilangPHP
     public static $app;
     // 默认运行模式
     public static $mode = 0;
+    public static $httpmode = 0;
     public static $cache = [];
     public static $db = null;
 
@@ -48,6 +49,7 @@ final Class SilangPHP
     {
         self::$cache[$key] = $value;
     }
+
     /**
      * 设置程序目录
      * @param $path
@@ -65,17 +67,15 @@ final Class SilangPHP
         $appName = basename($path);
         // 默认时区
         date_default_timezone_set('Asia/Shanghai');
-        define('DS',DIRECTORY_SEPARATOR);
+        define('DS',                 DIRECTORY_SEPARATOR);
         define("PS_APP_PATH",        $path);
         define("PS_APP_NAME",        $appName);
         define("PS_CONFIG_PATH",     PS_ROOT_PATH."/Config/");
         define("PS_RUNTIME_PATH",	 PS_ROOT_PATH."/Runtime/");
-
         if(file_exists(PS_CONFIG_PATH.'/define.php'))
         {
             require_once(PS_CONFIG_PATH.'/define.php');
         }
-
         $dbconfig = \SilangPHP\Config::get("Db.mysql");
         if($dbconfig)
         {
@@ -101,7 +101,8 @@ final Class SilangPHP
             self::$db->bootEloquent();
         }
         self::$mode = \SilangPHP\Config::get("Site.mode");
-        switch(self::$mode)
+        self::$httpmode = \SilangPHP\Config::get("Site.httpmode") ?? 0;
+        switch(self::$httpmode)
         {
             case 0:
                 self::$app = new \SilangPHP\Httpmode\Appfpm();

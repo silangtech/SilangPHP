@@ -16,32 +16,31 @@
 declare(strict_types=1);
 namespace SilangPHP;
 
+/**
+ * 暂时去掉seaslog
+ */
 class Log
 {
-    //默认使用seaslog作为写入日志 [2 seaslog |1 file_put_contents error_log]
-    public $type = 2;
-    //日志类型
-    public $log_type = array("debug"=>1,"info"=>2,"notice"=>3,"error"=>4,"critical"=>5,"emergency"=>6,"alert"=>7);
+    const EMERGENCY = 'emergency';
+    const ALERT     = 'alert';
+    const CRITICAL  = 'critical';
+    const ERROR     = 'error';
+    const WARNING   = 'warning';
+    const NOTICE    = 'notice';
+    const INFO      = 'info';
+    const DEBUG     = 'debug';
+
+    public $type = 'text';
     //日志起始地址
     private $pathRoot = '';
     //日志地址
     private $path = '';
-    //日志目录类型
+    //日志目录类型, 默认按日期存放
     public $default_dir_type = 'date';
-    public function __construct($default_dir='' ,$type = '')
+    public function __construct($default_dir='' ,$type = 'text')
     {
-        if($type == 2)
-        {
-            $this->type = 2;
-        }else{
-            if (!extension_loaded('seaslog'))
-            {
-                $this->type = 1;
-            }else{
-                $this->type = 2;
-            }
-        }
-        //记录日志地址
+        $this->type = $type;
+        // 统一日志路径
         $this->setLogPath(PS_RUNTIME_PATH.'/log/');
         //二级日志地址
         if(empty($default_dir))
@@ -53,123 +52,105 @@ class Log
     }
 
     /**
-     * 操作的动作
-     */
-    public function _action($data,$type='info')
-    {
-        if($this->default_dir_type == 'date')
-        {
-            $default_dir = date("Ymd");
-            $this->setLogDirName($default_dir);
-        }else{
-            $this->setLogDirName($this->default_dir_type);
-        }
-        if(!isset($this->log_type[strtolower($type)]))
-        {
-            return false;
-        }
-        if($this->type==2)
-        {
-            call_user_func_array("\SeasLog::{$type}",array($data));
-        }else{
-            $date = date("YmdH");
-            $time = time();
-            $log = "[{$type}]".$data." time:{$time}\n";
-            file_put_contents($this->path.'/'.$date.'.log',$log,FILE_APPEND|LOCK_EX);
-        }
-    }
-
-    /**
-     * 直接写内容不用添加其它东西
-     * @param $data
-     */
-    public function write($data)
-    {
-        if($this->default_dir_type == 'date')
-        {
-            $default_dir = date("Ymd");
-            $this->setLogDirName($default_dir);
-        }else{
-            $this->setLogDirName($this->default_dir_type);
-        }
-        $date = date("YmdHi");
-        file_put_contents($this->path.'/'.$date.'.log',$data,FILE_APPEND|LOCK_EX);
-    }
-
-    /**
      * 记录log
      */
-    public function log($data,$type='')
+    public function log($level, $message, array $context = array())
     {
-        if($this->type==2)
+        $record = [
+            'level'   => $level,
+            'message' => $message,
+            'context' => $context,
+        ];
+        if($this->default_dir_type == 'date')
         {
-            \SeasLog::log($type, $data);
+            $default_dir = date("Ymd");
+            $this->setLogDirName($default_dir);
+        }else{
+            $this->setLogDirName($this->default_dir_type);
         }
+        // 记录每小时的变化
+        $date = date("YmdH");
+        if($this->type == 'text')
+        {
+            $text = "[{$level}]".$this->interpolate($message, $context);
+        }elseif($this->type == 'json')
+        {
+            $text = json_encode($record);
+        }
+        file_put_contents($this->path.'/'.$date.'.log', $text,FILE_APPEND|LOCK_EX);
+    }
+
+    /**
+     * 用上下文信息替换记录信息中的占位符
+     */
+    function interpolate($message, array $context = array())
+    {
+        // 构建一个花括号包含的键名的替换数组
+        $replace = array();
+        foreach ($context as $key => $val) {
+            // 检查该值是否可以转换为字符串
+            if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
+                $replace['{' . $key . '}'] = $val;
+            }
+        }
+        // 替换记录信息中的占位符，最后返回修改后的记录信息。
+        return strtr($message, $replace);
     }
 
     /**
      * debug日志
      */
-    public function debug($data)
+    public function debug($message, array $context = array())
     {
-        $this->_action($data,__FUNCTION__);
+        $this->log(Log::EMERGENCY, $message, $context);
     }
 
     /**
      * info日志
      */
-    public function info($data)
+    public function info($message, array $context = array())
     {
-        $this->_action($data,__FUNCTION__);
+        $this->log(Log::INFO, $message, $context);
     }
 
     /**
      * notice日志
      */
-    public function notice($data)
+    public function notice($message, array $context = array())
     {
-        $this->_action($data,__FUNCTION__);
+        $this->log(Log::NOTICE, $message, $context);
     }
 
     /**
      * error日志
      */
-    public function error($data)
+    public function error($message, array $context = array())
     {
-        $this->_action($data,__FUNCTION__);
+        $this->log(Log::ERROR, $message, $context);
     }
 
     /**
      * critical日志
      */
-    public function critical($data)
+    public function critical($message, array $context = array())
     {
-        $this->_action($data,__FUNCTION__);
+        $this->log(Log::CRITICAL, $message, $context);
     }
 
     /**
      * alert日志
      */
-    public function alert($data)
+    public function alert($message, array $context = array())
     {
-        $this->_action($data,__FUNCTION__);
+        $this->log(Log::ALERT, $message, $context);
     }
 
     /**
      * emergency日志
      */
-    public function emergency($data)
+    public function emergency($message, array $context = array())
     {
-        $this->_action($data,__FUNCTION__);
-    }
-
-    /**
-     * 记录一下
-     * @param $data
-     */
-    public function record($data)
-    {
-        $this->_action($data,__FUNCTION__);
+        $this->log(Log::EMERGENCY, $message, $context);
     }
 
     /**
@@ -177,12 +158,7 @@ class Log
      */
     public function setLogPath($path = '')
     {
-        if($this->type=='2')
-        {
-            \SeasLog::setBasePath($path);
-        }else{
-            $this->pathRoot = $path;
-        }
+        $this->pathRoot = $path;
     }
 
     /**
@@ -197,17 +173,12 @@ class Log
         {
             return '';
         }
-        if($this->type=='2')
-        {
-            \SeasLog::setLogger($name);
-        }else{
-            $this->path = $this->pathRoot."/".$name."/";
-            //要判断一下mkdir吧
-            if (!is_dir($this->path)){
-                $this->dir_make($this->path);
-            }
+        $this->path = $this->pathRoot."/".$name."/";
+        //要判断一下mkdir吧
+        if (!is_dir($this->path)){
+            $this->dir_make($this->path);
         }
-    }
+}
 
     /**
      * 创建文件夹
@@ -215,7 +186,7 @@ class Log
      */
     public function dir_make($path)
     {
-        $tmp = mkdir($path,0777,true);
+        $tmp = mkdir($path, 0777, true);
         return $tmp;
     }
 

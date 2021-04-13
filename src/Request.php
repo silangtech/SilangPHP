@@ -46,7 +46,7 @@ class Request
 
     public function __construct()
     {
-        if(SilangPHP::$mode == 0)
+        if(SilangPHP::$httpmode == 0)
         {
             $this->posts = $_POST ?? [];
             $this->gets = $_GET ?? [];

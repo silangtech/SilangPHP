@@ -36,7 +36,23 @@ class Di
      */
     public function get($abstract)
     {
-        return self::$container[$abstract] ?? '';
+        return self::$container[$abstract] ?? null;
+    }
+
+    /**
+     *  判断是否有存在
+     *
+     * @param [type] $abstract
+     * @return boolean
+     */
+    public function has($abstract)
+    {
+        if(isset(self::$container[$abstract]))
+        {
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /**

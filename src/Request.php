@@ -44,6 +44,10 @@ class Request
 
     public $hander = null;
 
+    public $uri_target = '';
+
+    public $uri = '';
+
     public function __construct()
     {
         if(SilangPHP::$httpmode == 0)
@@ -54,6 +58,9 @@ class Request
             $this->cookies = $_COOKIE ?? [];
             $this->request = $_REQUEST ?? [];
             $this->raw = file_get_contents("php://input") ?? '';
+            $this->withMethod($_SERVER['REQUEST_METHOD']);
+            $this->withUri($_SERVER["REQUEST_URI"]);
+            $this->withRequestTarget($_SERVER['REQUEST_URI']);
         }
         // 跑取获得的header
         foreach ($_SERVER as $key => $val) {
@@ -71,6 +78,41 @@ class Request
     public function isAjax()
     {
         return $this->header["X-Requested-With"] === "XMLHttpRequest";
+    }
+
+    public function getRequestTarget()
+    {
+        return $this->uri_target;
+    }
+    
+    public function withRequestTarget($requestTarget)
+    {
+        $this->uri_target = $requestTarget;
+    }
+
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    public function withMethod($method)
+    {
+        $this->method = $method;
+    }
+
+    public function getUri()
+    {
+        return $this->uri;
+    }
+
+    public function withUri($uri, $preserveHost = false)
+    {
+        $this->uri = $uri;
+    }
+
+    public function getUploadedFiles()
+    {
+        
     }
 
     /**

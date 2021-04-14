@@ -21,6 +21,7 @@ class Response
     public $body = '';
     // 状态码一般正确返回是200
     public $status = 200;
+    public $protocol = '1.1';
     public $hander = null;
     public $httpCode = [
         100 => 'Continue',
@@ -105,11 +106,14 @@ class Response
         // 直接设置header
         foreach($this->cors as $key=>$val)
         {
+            $this->withHeader($key, $val);
+            // @todo 输出的时候处理
             $this->header($key,$val);
         }
     }
 
     /**
+     * 立即输出
      * 设置头部
      */
     public function header($key, $value = '')
@@ -215,4 +219,74 @@ class Response
         return $result;
     }
 
+    public function getProtocolVersion()
+    {
+        return $this->protocol;
+    }
+
+    public function withProtocolVersion($version)
+    {
+        $this->protocol = $version;
+    }
+
+    public function getHeaders()
+    {
+        return $this->header;
+    }
+
+    public function hasHeader($name)
+    {
+        return isset($this->header[$name]);
+    }
+
+    public function getHeader($name)
+    {
+        return $this->header[$name];
+    }
+
+    public function getHeaderLine($name)
+    {
+        return $this->header[$name];
+    }
+
+    public function withHeader($name, $value)
+    {
+        $this->header[$name] = $value;
+    }
+
+    public function withAddedHeader($name, $value)
+    {
+        $this->header[$name] .= $value;
+    }
+
+    public function withoutHeader($name)
+    {
+        unset($this->header[$name]);
+        return true;
+    }
+
+    public function getBody()
+    {
+
+    }
+
+    public function withBody($body)
+    {
+
+    }
+
+    public function getStatusCode()
+    {
+        return $this->status;
+    }
+
+    public function withStatus($code, $reasonPhrase = '')
+    {
+
+    }
+
+    public function getReasonPhrase()
+    {
+
+    }
 }

@@ -21,6 +21,7 @@ Class Config
     use Instance;
     //框架配置文件
     public $config = [];
+    public $envconfig = [];
 
     /**
      * 初始化配置
@@ -137,6 +138,7 @@ Class Config
     {
         $envPath = PS_ROOT_PATH.'/.env';
         $env = parse_ini_file($envPath,true);
+        self::$envconfig = $env;
         return $env;
     }
 

@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace SilangPHP;
 
 /**
+ * 日志类
  * 暂时去掉seaslog
  */
 class Log

@@ -103,13 +103,6 @@ Class Error
                 }
             }
         }
-        //生产环境不理会普通的警告错误
-        $not_save_error = array(E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_NOTICE, E_USER_WARNING, E_WARNING);
-        if( !in_array($errno, $not_save_error) )
-        {
-            //错误类型为0
-//            return '@';
-        }
         //读取源码指定行
         if( !is_file($filename) )
         {

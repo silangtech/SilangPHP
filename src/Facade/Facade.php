@@ -31,7 +31,7 @@ class Facade
      * @param $args
      * @return mixed
      */
-    public static function getInstance($classname,$args){
+    public static function getInstance($classname, $args){
         $name = basename($classname);
         if(!isset(self::$facade_obj[$name]))
         {
@@ -56,8 +56,8 @@ class Facade
      * @param $arg
      * @return mixed
      */
-    public static function __callstatic($method,$arg){
+    public static function __callstatic($method, $arg){
         $instance=static::getInstance(static::getFacadeAccessor(),[]);
-        return call_user_func_array(array($instance,$method),$arg);
+        return call_user_func_array(array($instance, $method), $arg);
     }
 }

@@ -45,7 +45,7 @@ class Di
      * @param array $parameters
      * @return mixed
      */
-    public function make($abstract,$parameters=[]){
+    public function make($abstract, $parameters=[]){
         if(!isset(self::$container[$abstract]))
         {
             if(class_exists($abstract)) {

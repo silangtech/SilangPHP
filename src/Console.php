@@ -38,12 +38,22 @@ Class Console{
     public static $user = 'www-data';
 
     /**
+     * 输出
+     *
+     * @return void
+     */
+    public static function print(string $content = '')
+    {
+        echo PHP_EOL."\033[34m ".$content." \033[0m".PHP_EOL;
+    }
+
+    /**
      * 运行Command
      */
-    public static function start($action = '', $input='', $usergroup = [])
+    public static function start($action = '', $input = '', $usergroup = [])
     {
         self::changeUser($usergroup);
-        echo self::$welcome;
+        self::print(self::$welcome);
         $argv = $_SERVER['argv'];
         if($action)
         {
@@ -53,7 +63,7 @@ Class Console{
             {
                 $action = self::getAction($argv[1]);
             }else{
-                echo PHP_EOL."\033[31m 缺少 action!! \033[0m".PHP_EOL;
+                self::print("缺少 action!!");
                 return false;
             }
         }
@@ -127,7 +137,7 @@ Class Console{
      * 改变进程的用户ID
      * @param $user
      */
-    public static function changeUser($usergroup = [])
+    public static function changeUser(array $usergroup = [])
     {
         if(isset($usergroup['user']))
         {

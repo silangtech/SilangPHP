@@ -28,6 +28,7 @@ class Session{
 
     /**
      * 设置session type
+     * @todo 动态切换的方法
      * @param $type
      */
     public static function setSessionType($type)

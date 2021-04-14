@@ -101,7 +101,7 @@ class Controller
      */
     public function success($msg = '', $data = '')
     {
-        return $this->response->json(0,$msg,$data);
+        return $this->response->json(0, $msg, $data);
     }
 
     /**

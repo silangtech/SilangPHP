@@ -128,9 +128,9 @@ class Response
     /**
      * toJson
      */
-    public function toJson($result, $param = '')
+    public function toJson($result, $jsontype = JSON_UNESCAPED_UNICODE)
     {
-        return json_encode($result);
+        return json_encode($result, $jsontype);
     }
 
     /**
@@ -139,8 +139,8 @@ class Response
      */
     public function json($code=0, $msg='', $data='', $jsontype = JSON_UNESCAPED_UNICODE)
     {
-        $result = $this->returnArray($code,$msg,$data);
-        return json_encode($result,$jsontype);
+        $result = $this->returnArray($code, $msg, $data);
+        return json_encode($result, $jsontype);
     }
 
     /**

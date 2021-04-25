@@ -124,23 +124,42 @@ class Request
      * @param integer $erorcode
      * @return void
      */
-    public function validate($input = [],array $rules =[] ,$code = 11000)
+    public function validate($input = [], array $rules = [] , $message = [], $code = 11000)
     {
+
+        $messages = [
+            'required'       => 'The :attribute field is required.',
+            'email.required' => '我们需要知道你的email地址',
+            'same'           => 'The :attribute and :other must match.',
+            'size'           => 'The :attribute must be exactly :size.',
+            'between'        => 'The :attribute value :input is not between :min - :max.',
+            'in'             => 'The :attribute must be one of the following types: :values',
+        ];
+
+        foreach($message as $key => $val)
+        {
+            $messages[$key] = $val;
+        }
         // $translationPath = PS_RUNTIME_PATH.'/lang';
         if(empty($this->validator))
         {
-            $translationLocale = 'en';
+            $translationLocale = 'zh';
             $translationPath = '';
             $transFileLoader = new \Illuminate\Translation\FileLoader(new \Illuminate\Filesystem\Filesystem, $translationPath);
             $translator = new \Illuminate\Translation\Translator($transFileLoader, $translationLocale);
             $this->validator = new \Illuminate\Validation\Factory($translator);
         }
-        // $validator = \Illuminate\Support\Facades\Validator::make($input, $rules);
-        $validator = $this->validator->make($input, $rules);
+        // $validator = \Illuminate\Support\Facades\Validator::make($input, $rules, $message);
+        $validator = $this->validator->make($input, $rules, $messages);
         if ($validator->fails()) {
             $message = $validator->messages();
             // $errors = $validator->errors();
-            $fail =  \SilangPHP\SilangPHP::$app->response->json($code, 'error', $message);
+            foreach($message->all() as $mess)
+            {
+                $messagefirst = $mess;
+                break;
+            }
+            $fail =  \SilangPHP\SilangPHP::$app->response->json($code, 'error', $messagefirst);
             throw new \Exception($fail, $code);
         }
     }

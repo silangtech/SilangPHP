@@ -25,7 +25,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
  */
 final Class SilangPHP
 {
-    const VERSION = '1.3.0';
+    const VERSION = '1.4.0';
     
     public static $app;
     // 默认运行模式
@@ -102,6 +102,10 @@ final Class SilangPHP
         }
         self::$mode = \SilangPHP\Config::get("Site.mode");
         self::$httpmode = \SilangPHP\Config::get("Site.httpmode") ?? 0;
+        if(is_array(self::$httpmode))
+        {
+            self::$httpmode = 0;
+        }
         switch(self::$httpmode)
         {
             case 0:

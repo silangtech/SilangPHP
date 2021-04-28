@@ -78,7 +78,7 @@ class Log
         {
             $text = json_encode($record);
         }
-        file_put_contents($this->path.'/'.$date.'.log', $text,FILE_APPEND|LOCK_EX);
+        file_put_contents($this->path.'/'.$date.'.log', $text."\r\n",FILE_APPEND|LOCK_EX);
     }
 
     /**

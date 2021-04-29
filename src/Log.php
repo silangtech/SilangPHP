@@ -38,18 +38,15 @@ class Log
     private $path = '';
     //日志目录类型, 默认按日期存放
     public $default_dir_type = 'date';
-    public function __construct($default_dir='' ,$type = 'text')
+    public function __construct($default_dir = '' , $logPath = PS_RUNTIME_PATH.'/log/', $type = 'text')
     {
         $this->type = $type;
         // 统一日志路径
-        $this->setLogPath(PS_RUNTIME_PATH.'/log/');
-        //二级日志地址
-        if(empty($default_dir))
+        if(!empty($default_dir))
         {
-            $this->default_dir_type = 'date';
-        }else{
-            $this->default_dir_type = $default_dir;
+            $logPath .= $default_dir.'/';
         }
+        $this->setLogPath($logPath);
     }
 
     /**

@@ -81,6 +81,12 @@ Class Console{
 
         $controller = $action[0];
         $action = $action[1];
+        // 指定配置的读取
+        $config = \SilangPHP\Config::get("Console");
+        if(isset($config[$controller]))
+        {
+            $controller = $config[$controller];
+        }
         $cls = PS_APP_NAME.'\\Command\\'. $controller . 'Commander';
         if(!class_exists($cls)){
             throw new \Exception("Commander $cls not found!");

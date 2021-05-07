@@ -78,7 +78,7 @@ Class Appswoole{
     /**
      * 更新双R
      */
-    public function updateR($request,$response)
+    public function updateR($request, $response)
     {
         $this->request = new \SilangPHP\Request();
         $this->response = new \SilangPHP\Response();
@@ -93,8 +93,8 @@ Class Appswoole{
 
         $this->response->hander = $response;
 
-        \SilangPHP\Di::instance()->set(Request::class,$this->request);
-        \SilangPHP\Di::instance()->set(Response::class,$this->response);
+        \SilangPHP\Di::instance()->set(Request::class, $this->request);
+        \SilangPHP\Di::instance()->set(Response::class, $this->response);
     }
 
     /**
@@ -123,25 +123,28 @@ Class Appswoole{
                 $serviceHost = $frameconfig['host'] ?? '0.0.0.0';
                 $servicePort = $frameconfig['port'] ?? 8080;
                 $serverWorkerCount = $frameconfig['count'] ?? 1;
-
                 $http = new \Swoole\Http\Server($serviceHost, $servicePort);
-
+                $http->set([
+                    'worker_num' => swoole_cpu_num() * 2,
+                    'user' => 'www-data',
+                    'group' => 'www-data',
+                    'daemonize' => 1,
+                    'backlog' => 128,
+                    'pid_file' => PS_RUNTIME_PATH.$servicePort.'.pid',
+                    'log_file' => PS_RUNTIME_PATH.$servicePort.'.log',
+                ]);
                 $http->on("start", function ($server) {
                     
                 });
                 $app = $this;
                 $http->on('request', function ($request, $response) use($app) {
                     $app->updateR($request,$response);
-
                     $path = $request->server['request_uri'];
                     $method = $request->server['request_method'];
-                    $res = \SilangPHP\Route::start($path,$method);
-
-                    $response->header("Content-Type", "text/html; charset=utf-8");
+                    $res = \SilangPHP\Route::start($path, $method);
                     $response->end($res);
                 });
                 $http->start();
-
             }
         }catch(\SilangPHP\Exception\routeException $e){
             return 'app route error';

@@ -107,8 +107,6 @@ class Response
         foreach($this->cors as $key=>$val)
         {
             $this->withHeader($key, $val);
-            // @todo 输出的时候处理
-            $this->header($key,$val);
         }
     }
 
@@ -252,6 +250,7 @@ class Response
     public function withHeader($name, $value)
     {
         $this->header[$name] = $value;
+        $this->header($name, $value);
     }
 
     public function withAddedHeader($name, $value)

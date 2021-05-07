@@ -68,7 +68,7 @@ class Request
                 $key = substr($key, 5);
                 $key = str_replace('_', ' ', $key);
                 $key = str_replace(' ', '-', $key);
-                $key = strtoupper($key);
+                $key = strtolower($key);
                 $this->header[$key] = $val;
             }
         }

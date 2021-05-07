@@ -54,25 +54,25 @@ class Request
         {
             $this->posts = $_POST ?? [];
             $this->gets = $_GET ?? [];
-            $this->server = $_SERVER ?? [];
+            // $this->server = $_SERVER ?? [];
             $this->cookies = $_COOKIE ?? [];
             $this->request = $_REQUEST ?? [];
             $this->raw = file_get_contents("php://input") ?? '';
             $this->withMethod($_SERVER['REQUEST_METHOD']);
             $this->withUri($_SERVER["REQUEST_URI"]);
             $this->withRequestTarget($_SERVER['REQUEST_URI']);
-        }
-        // 跑取获得的header
-        foreach ($_SERVER as $key => $val) {
-            if (substr($key, 0, 5) === 'HTTP_') {
-                $key = substr($key, 5);
-                $key = str_replace('_', ' ', $key);
-                $key = str_replace(' ', '-', $key);
-                $key = strtolower($key);
-                $this->header[$key] = $val;
+            // 跑取获得的header
+            foreach ($_SERVER as $key => $val) {
+                $this->server[strtolower($key)] = $val;
+                if (substr($key, 0, 5) === 'HTTP_') {
+                    $key = substr($key, 5);
+                    $key = str_replace('_', ' ', $key);
+                    $key = str_replace(' ', '-', $key);
+                    $key = strtolower($key);
+                    $this->header[$key] = $val;
+                }
             }
         }
-        // $this->method = $this->server['REQUEST_METHOD'];
     }
 
     public function isAjax()

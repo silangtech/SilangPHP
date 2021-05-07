@@ -87,6 +87,8 @@ Class Appswoole{
         $this->request->posts = $this->request->hander->post;
         $this->request->cookies = $this->request->hander->cookie;
         $this->request->files = $this->request->hander->files;
+        $this->request->server = $this->request->hander->server;
+        $this->request->header = $this->request->hander->header;
         $this->request->raw = $this->request->hander->rawContent();
 
         $this->response->hander = $response;

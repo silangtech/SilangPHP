@@ -106,6 +106,9 @@ final Class SilangPHP
         {
             self::$httpmode = 0;
         }
+        if (defined('SLPHP_HTTPMODE')) {
+            self::$httpmode = SLPHP_HTTPMODE;
+        }
         switch(self::$httpmode)
         {
             case 0:

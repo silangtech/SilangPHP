@@ -13,8 +13,6 @@
     "require": {
         "php": ">=7.1.0",
         "guzzlehttp/guzzle": "6.3",
-        "silangtech/util": "dev-master",
-        "silangtech/jwt": "dev-master",
         "nikic/fast-route": "v1.3.0",
         "illuminate/database": "v8.24.0",
         "illuminate/validation": "v8.24.0",

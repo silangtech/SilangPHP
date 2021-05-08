@@ -13,7 +13,7 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
-namespace SilangPHP\Util;
+namespace SilangPHP\Helper;
 class Util
 {
     public static $client_ip;
@@ -119,7 +119,7 @@ class Util
     {
         if(!self::$iphand)
         {
-            self::$iphand = new \SilangPHP\Util\Ip();
+            self::$iphand = new \SilangPHP\Helper\Ip();
         }
         $data = self::$iphand->find($ip);
         $result['Country'] = $data['0'] ?? '';

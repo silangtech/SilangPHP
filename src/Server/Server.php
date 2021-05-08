@@ -15,7 +15,7 @@
 */
 namespace SilangPHP\Server;
 
-class Server extends \Swoole\Server implements \SilangPHP\Rpc\Base
+class Server extends \Swoole\Server implements \SilangPHP\Server\Base
 {
     public $serv = null;
     public $worker_num = 2;

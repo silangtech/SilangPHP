@@ -58,8 +58,7 @@ Class Appworker{
             // 开启ip的情况
             if($safe_ip)
             {
-                // 注安卓ip模式 composer要加载\SilangPHP\Util工具类
-                $ip = \SilangPHP\Util\Util::get_client_ip();
+                $ip = \SilangPHP\Helper\Util::get_client_ip();
                 if( (in_array($ip,$safe_ip)) )
                 {
                     $debug = 1;

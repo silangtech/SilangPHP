@@ -31,7 +31,7 @@ class Route extends \FastRoute\Route
     /**
      * 封装常用get方法
      */
-    public static function get($path,\Closure $cb)
+    public static function get($path, \Closure $cb)
     { 
         self::$rules_exec[$path.'_GET'] = $cb;
     }
@@ -39,7 +39,7 @@ class Route extends \FastRoute\Route
     /**
      * 封装常用post方法
      */
-    public static function post($path,\Closure $cb)
+    public static function post($path, \Closure $cb)
     {
         self::$rules_exec[$path.'_POST'] = $cb;
     }
@@ -91,7 +91,7 @@ class Route extends \FastRoute\Route
                     {
                         return '404';
                     }else{
-                        return self::found($path,$method);
+                        return self::found($path, $method);
                     }
                     break;
                 case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
@@ -141,7 +141,7 @@ class Route extends \FastRoute\Route
                     break;
             }
         }else{
-            return self::found($path,$method);
+            return self::found($path, $method);
         }
     }
 

@@ -83,14 +83,14 @@ final Class SilangPHP
             foreach($dbconfig as $connection_name => $config)
             {
                 $db_arr = [
-                    'driver'    => $config['dbtype'] ?? 'mysql', 
+                    'driver'    => $config['dbtype'] ?: 'mysql', 
                     'host'      => $config['host'],
                     'port'      => $config['port'],
                     'database'  => $config['dbname'],
                     'username'  => $config['username'],
                     'password'  => $config['password'],
-                    'charset'   => 'utf8',
-                    'collation' => 'utf8_general_ci',
+                    'charset'   => $config['charset'] ?: 'utf8',
+                    'collation' => $config['collation'] ?: 'utf8_general_ci',
                     'prefix'    => '',
                 ];
                 self::$db->addConnection($db_arr,$connection_name);

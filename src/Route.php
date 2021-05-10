@@ -44,7 +44,7 @@ class Route extends \FastRoute\Route
         self::$rules_exec[$path.'_POST'] = $cb;
     }
 
-    public static function middle($method,$path_array = [],$middlewares = [])
+    public static function middle($method, $path_array = [], $middlewares = [])
     {
         if($path_array)
         {
@@ -64,9 +64,9 @@ class Route extends \FastRoute\Route
      * @return bool|mixed
      * @throws \ReflectionException
      */
-    public static function start($path = '' ,$method = 'GET')
+    public static function start($path = '' , $method = 'GET')
     {
-        $path = parse_url($path,PHP_URL_PATH);
+        $path = parse_url($path, PHP_URL_PATH);
         // 默认加载的类
         if(empty($path) || $path === '/' || $path === '/index.php')
         {
@@ -86,7 +86,7 @@ class Route extends \FastRoute\Route
             $routeInfo = $dispatcher->dispatch($method, $uri);
             switch ($routeInfo[0]) {
                 case \FastRoute\Dispatcher::NOT_FOUND:
-                    // 看看有没默认模式，没有就直接404
+                    // 看看有没默认模式，没有就直接404,强路由模式为2
                     if(Config::get("Site.routemode") == '2')
                     {
                         return '404';
@@ -96,6 +96,10 @@ class Route extends \FastRoute\Route
                     break;
                 case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
                     $allowedMethods = $routeInfo[1];
+                    if(Config::get("Site.routemode") == '2')
+                    {
+                        return 'not method';
+                    }
                     break;
                 case \FastRoute\Dispatcher::FOUND:
                     $handler = $routeInfo[1];
@@ -126,9 +130,13 @@ class Route extends \FastRoute\Route
                                 }
                             }
                         }
-                        return call_user_func_array($handler, $argsParam );
+                        $fastpath = call_user_func_array($handler, $argsParam );
+                        if(!empty($fastpath))
+                        {
+                            self::found($fastpath, $method, $vars);
+                        }
                     }else{
-                        return self::found($handler,$method,$vars);
+                        return self::found($handler, $method, $vars);
                     }
                     break;
             }
@@ -176,11 +184,11 @@ class Route extends \FastRoute\Route
             if(file_exists($controllerpath2))
             {
                 $controllerpath = $controllerpath2;
-                array_push($controlstack,ucfirst($searchpath));
+                array_push($controlstack, ucfirst($searchpath));
                 unset(self::$path_array[$searchkey]);
             }else{
                 $controller = ucfirst($searchpath);
-                array_push($controlstack,$controller);
+                array_push($controlstack, $controller);
                 unset(self::$path_array[$searchkey]);
                 $action = isset(self::$path_array[$searchkey+1]) ? self::$path_array[$searchkey+1] : $action;
                 unset(self::$path_array[$searchkey + 1]);
@@ -191,7 +199,7 @@ class Route extends \FastRoute\Route
         {
             self::$path_array = $vars;
         }
-        return self::load_controller($controlstack,$action,$middlewares);
+        return self::load_controller($controlstack, $action, $middlewares);
     }
 
     /**

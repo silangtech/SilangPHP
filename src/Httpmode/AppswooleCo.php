@@ -149,7 +149,7 @@ Class AppswooleCo{
                     $response->end($res);
                 });
                 $http->start();
-
+                return true;
             }
         }catch(\SilangPHP\Exception\routeException $e){
             return 'app route error';

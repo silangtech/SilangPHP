@@ -163,6 +163,5 @@ Class Appworker{
         $res = \SilangPHP\Route::start($path,$method);
         $this->endTime = microtime(true);
         $connection->send($res);
-        // return $this->response->end($res);
     }
 }

@@ -143,7 +143,12 @@ final Class SilangPHP
             }catch(\Exception $e)
             {
                 $result = $e->getMessage();
-                self::$app->response->end($result);
+                if(self::$app->response)
+                {
+                    self::$app->response->end($result);
+                }else{
+                    echo $result.PHP_EOL;
+                }
             }
             return $result;
         }

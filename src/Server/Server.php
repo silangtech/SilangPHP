@@ -100,6 +100,7 @@ class Server extends \Swoole\Server implements \SilangPHP\Server\Base
         $this->config();
         $this->event();
         $this->start();
+        return true;
     }
 
     /**

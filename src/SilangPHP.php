@@ -143,6 +143,7 @@ final Class SilangPHP
             }catch(\Exception $e)
             {
                 $result = $e->getMessage();
+                self::$app->logger->error("run:".$result);
                 if(self::$app->response)
                 {
                     self::$app->response->end($result);

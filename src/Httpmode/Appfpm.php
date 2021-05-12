@@ -16,65 +16,10 @@
 declare(strict_types=1);
 namespace SilangPHP\Httpmode;
 
-Class Appfpm{
-    public $appDir;
-    public $config = [];
-    public $ct = 'index';
-    public $ac = 'index';
-    public $debug = 1;
-    public $debug_ip = '';
-    public $startTime = '';
-    public $endTime = '';
-    public $cacheType = 'file';
-    public $request;
-    public $response;
+use SilangPHP\Log;
 
-    /**
-     * 初始化
-     */
-    public function initialize()
-    {
-        $this->config = \SilangPHP\Config::get("Site");
-        if($this->config)
-        {
-            $this->ct = $this->config['defaultController'] ?? 'index';
-            $this->ac = $this->config['defaultAction'] ?? 'index';
-            $this->debug = $this->config['debug'];
-            $this->debug_ip = $this->config['debug_ip'] ?? '';
-            $this->cacheType = $this->config['cacheType'] ?? 'file';
-        }
-        
-        if($this->debug = '1')
-        {
-            $safe_ip = '';
-            if($this->debug_ip)
-            {
-                $safe_ip = explode(",",$this->debug_ip);
-            }
-            $debug = 1;
-            // 开启ip的情况
-            if($safe_ip)
-            {
-                $ip = \SilangPHP\Helper\Util::get_client_ip();
-                if( (in_array($ip,$safe_ip)) )
-                {
-                    $debug = 1;
-                }else{
-                    $debug = 0;
-                }
-            }
-            if($debug)
-            {
-                error_reporting(E_ALL);
-                \SilangPHP\Error::register();
-            }else{
-                error_reporting(0);
-            }
-        }else{
-            error_reporting(0);
-        }
-    }
-
+Class Appfpm extends Appbase{
+    public $appname = 'fpm';
     /**
      * 更新双R
      */
@@ -116,6 +61,7 @@ Class Appfpm{
                 return $this->response->end($res);
             }
         }catch(\SilangPHP\Exception\routeException $e){
+            $this->logger->error($e->getMessage());
             if($this->debug == 1 || run_mode == 1)
             {
                 echo '404';

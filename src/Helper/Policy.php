@@ -1,19 +1,19 @@
 <?php
-namespace App\Helper;
+namespace SilangPHP\Helper;
 /**
  * 权限控制
  * Author:shengsheng
  * Class Policy
  * --------------------------------------------------------
  * // 每个角色不同的Policy
-    $policy = new Policy();
-    $policy->add("/index/login/test2",Policy::P_ALLOW);
-    $policy->add("/index/login/test3",Policy::P_ALLOW);
-    $policy->add("/index/*",Policy::P_ALLOW); // 全选的状态
-    $policy->add("/*",Policy::P_ALLOW);
-    $policy->add("/index/login/test4",Policy::P_DENY);
-    $check = $policy->check("/index");
-    var_dump($check);
+ *   $policy = new Policy();
+ *   $policy->add("/index/login/test2",Policy::P_ALLOW);
+ *   $policy->add("/index/login/test3",Policy::P_ALLOW);
+ *   $policy->add("/index/*",Policy::P_ALLOW); // 全选的状态
+ *   $policy->add("/*",Policy::P_ALLOW);
+ *   $policy->add("/index/login/test4",Policy::P_DENY);
+ *   $check = $policy->check("/index");
+ *   var_dump($check);
  */
 class Policy{
     // 允许

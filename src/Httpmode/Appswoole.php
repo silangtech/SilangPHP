@@ -16,64 +16,10 @@
 declare(strict_types=1);
 namespace SilangPHP\Httpmode;
 
-Class Appswoole{
-    public $appDir;
-    public $config = [];
-    public $ct = 'index';
-    public $ac = 'index';
-    public $debug = 1;
-    public $debug_ip = '';
-    public $startTime = '';
-    public $endTime = '';
-    public $cacheType = 'file';
-    public $request;
-    public $response;
+use SilangPHP\Log;
 
-    /**
-     * 初始化
-     */
-    public function initialize()
-    {
-        $this->config = \SilangPHP\Config::get("Site");
-        if($this->config)
-        {
-            $this->ct = $this->config['defaultController'] ?? 'index';
-            $this->ac = $this->config['defaultAction'] ?? 'index';
-            $this->debug = $this->config['debug'];
-            $this->debug_ip = $this->config['debug_ip'] ?? '';
-            $this->cacheType = $this->config['cacheType'] ?? 'file';
-        }
-        if($this->debug = '1')
-        {
-            $safe_ip = '';
-            if($this->debug_ip)
-            {
-                $safe_ip = explode(",",$this->debug_ip);
-            }
-            $debug = 1;
-            // 开启ip的情况
-            if($safe_ip)
-            {
-                $ip = \SilangPHP\Helper\Util::get_client_ip();
-                if( (in_array($ip,$safe_ip)) )
-                {
-                    $debug = 1;
-                }else{
-                    $debug = 0;
-                }
-            }
-            if($debug)
-            {
-                error_reporting(E_ALL);
-                \SilangPHP\Error::register();
-            }else{
-                error_reporting(0);
-            }
-        }else{
-            error_reporting(0);
-        }
-    }
-    
+Class Appswoole extends Appbase{
+    public $appname = 'swoole';
     /**
      * 更新双R
      */
@@ -140,7 +86,13 @@ Class Appswoole{
                     $app->updateR($request,$response);
                     $path = $request->server['request_uri'];
                     $method = $request->server['request_method'];
-                    $res = \SilangPHP\Route::start($path, $method);
+                    try{
+                        $res = \SilangPHP\Route::start($path, $method);
+                    }catch(\Exception $e)
+                    {
+                        $this->logger->error($e->getMessage());
+                        $res = 404;
+                    }
                     $response->end($res);
                 });
                 $http->start();

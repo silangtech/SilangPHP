@@ -61,7 +61,7 @@ class Kafka
             $this->topicConf = new \RdKafka\TopicConf();
             $this->topicConf->set('auto.commit.interval.ms', '100');
             $this->topicConf->set('offset.store.method', 'broker');
-            $this->topicConf->set('auto.offset.reset', 'earliest');
+            $this->topicConf->set('auto.offset.reset', 'smallest');
             $this->consumer = new \RdKafka\Consumer($this->conf);
             $this->consumer->addBrokers($this->broker_str);
         }

@@ -16,7 +16,6 @@
 namespace SilangPHP\Helper;
 class Util
 {
-    public static $client_ip;
     public static $iphand;
     /**
      * 获得用户的真实IP 地址
@@ -30,10 +29,9 @@ class Util
      */
     public static function get_client_ip()
     {
-        $client_ip = '';
-        if( self::$client_ip !== NULL )
+        if(isset(\SilangPHP\SilangPHP::$app->request->header['x-real-ip']))
         {
-            return self::$client_ip;
+            return \SilangPHP\SilangPHP::$app->request->header['x-real-ip'];
         }
         //分析代理IP
         if( isset(\SilangPHP\SilangPHP::$app->request->header['x-forwarded-for2']) )

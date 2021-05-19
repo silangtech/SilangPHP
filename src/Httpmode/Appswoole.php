@@ -59,6 +59,13 @@ Class Appswoole extends Appbase{
             }else{
                 $this->initialize();
             }
+            $argv = $_SERVER['argv'];
+            if(!isset($argv['1']))
+            {
+                $argv = 'start';
+            }else{
+                $argv = $argv['1'];
+            }
             // 运行数据或启动服务
             if($pathinfo == 'command')
             {
@@ -67,35 +74,56 @@ Class Appswoole extends Appbase{
                 $frameconfig = $this->config;
                 $serviceHost = $frameconfig['host'] ?? '0.0.0.0';
                 $servicePort = $frameconfig['port'] ?? 8080;
+                $pid_file = PS_RUNTIME_PATH.$servicePort.'.pid';
+                $log_file = PS_RUNTIME_PATH.$servicePort.'.log';
                 $serverWorkerCount = $frameconfig['count'] ?? 1;
-                $http = new \Swoole\Http\Server($serviceHost, $servicePort);
-                $http->set([
-                    'worker_num' => swoole_cpu_num() * 2,
-                    'user' => 'www-data',
-                    'group' => 'www-data',
-                    'daemonize' => 1,
-                    'backlog' => 128,
-                    'pid_file' => PS_RUNTIME_PATH.$servicePort.'.pid',
-                    'log_file' => PS_RUNTIME_PATH.$servicePort.'.log',
-                ]);
-                $http->on("start", function ($server) {
-                    
-                });
-                $app = $this;
-                $http->on('request', function ($request, $response) use($app) {
-                    $app->updateR($request,$response);
-                    $path = $request->server['request_uri'];
-                    $method = $request->server['request_method'];
-                    try{
-                        $res = \SilangPHP\Route::start($path, $method);
-                    }catch(\Exception $e)
+                if($argv == 'start')
+                {
+                    $http = new \Swoole\Http\Server($serviceHost, $servicePort);
+                    $http->set([
+                        'worker_num' => swoole_cpu_num() * 2,
+                        'user' => 'www-data',
+                        'group' => 'www-data',
+                        'daemonize' => 1,
+                        'backlog' => 128,
+                        'pid_file' => $pid_file,
+                        'log_file' => $log_file,
+                    ]);
+                    $http->on("start", function ($server) use ($servicePort) {
+                        swoole_set_process_name("SilangPHP_HTTP_SERVER".$servicePort);
+                    });
+                    $http->on("WorkerStart", function ($server) use ($servicePort) {
+                        swoole_set_process_name("SilangPHP_HTTP_SERVER".$servicePort."_worker");
+                    });
+                    $app = $this;
+                    $http->on('request', function ($request, $response) use($app) {
+                        $app->updateR($request,$response);
+                        $path = $request->server['request_uri'];
+                        $method = $request->server['request_method'];
+                        try{
+                            $res = \SilangPHP\Route::start($path, $method);
+                        }catch(\Exception $e)
+                        {
+                            $this->logger->error($e->getMessage());
+                            $res = 404;
+                        }
+                        $response->end($res);
+                    });
+                    $http->start();
+                }elseif($argv == 'stop'){
+                    if(file_exists($pid_file))
                     {
-                        $this->logger->error($e->getMessage());
-                        $res = 404;
+                        $pid = file_get_contents($pid_file);
+                        if($pid)
+                        {
+                            \Swoole\Process::kill((int)$pid, SIGTERM);
+                        }
+                        $pid = file_put_contents($pid_file, "");
+                        echo '停止web服务!'.PHP_EOL;
+                    }else{
+                        echo '没有找到可停止的web服务';
                     }
-                    $response->end($res);
-                });
-                $http->start();
+                }
             }
             return true;
         }catch(\SilangPHP\Exception\routeException $e){

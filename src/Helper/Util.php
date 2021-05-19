@@ -123,15 +123,15 @@ class Util
      */
     public static function get_cururl()
     {
-        if(!empty($_SERVER["REQUEST_URI"]))
+        if(!empty(\SilangPHP\SilangPHP::$app->request->server["request_uri"]))
         {
-            $scriptName = $_SERVER["REQUEST_URI"];
+            $scriptName = \SilangPHP\SilangPHP::$app->request->server["request_uri"];
             $nowurl = $scriptName;
         }
         else
         {
-            $scriptName = $_SERVER["PHP_SELF"];
-            $nowurl = empty($_SERVER["QUERY_STRING"]) ? $scriptName : $scriptName."?".$_SERVER["QUERY_STRING"];
+            $scriptName = \SilangPHP\SilangPHP::$app->request->server["php_self"];
+            $nowurl = empty(\SilangPHP\SilangPHP::$app->request->server["query_string"]) ? $scriptName : $scriptName."?".\SilangPHP\SilangPHP::$app->request->server["query_string"];
         }
         return $nowurl;
     }

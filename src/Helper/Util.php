@@ -54,15 +54,7 @@ class Util
             $client_ip = isset(\SilangPHP\SilangPHP::$app->request->server['remote_addr']) ? \SilangPHP\SilangPHP::$app->request->server['remote_addr'] : '';
         }
         preg_match("/[\d\.]{7,15}/", $client_ip, $onlineip);
-        if(empty($onlineip[0]))
-        {
-            if(isset(\SilangPHP\SilangPHP::$app->request->header['x-real-ip']))
-            {
-                $onlineip[0] = \SilangPHP\SilangPHP::$app->request->header['x-real-ip'];
-            }
-        }
         $client_ip = ! empty($onlineip[0]) ? $onlineip[0] : '0.0.0.0';
-        self::$client_ip = $client_ip;
         return $client_ip;
     }
 

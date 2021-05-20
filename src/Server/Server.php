@@ -140,6 +140,7 @@ class Server extends \Swoole\Server implements \SilangPHP\Server\Base
     public function onShutdown(\Swoole\Server $server)
     {
     }
+    
 
     public function onWorkerStart(\Swoole\Server $server, $worker_id)
     {
@@ -160,6 +161,7 @@ class Server extends \Swoole\Server implements \SilangPHP\Server\Base
 
     public function onManagerStart(\Swoole\Server $serv)
     {
+        swoole_set_process_name($this->processName."_manager");
     }
 
     public function onManagerStop(\Swoole\Server $serv)

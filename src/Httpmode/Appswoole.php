@@ -20,6 +20,7 @@ use SilangPHP\Log;
 
 Class Appswoole extends Appbase{
     public $appname = 'swoole';
+    public $http;
     /**
      * 更新双R
      */
@@ -79,8 +80,8 @@ Class Appswoole extends Appbase{
                 $serverWorkerCount = $frameconfig['count'] ?? 1;
                 if($argv == 'start')
                 {
-                    $http = new \Swoole\Http\Server($serviceHost, $servicePort);
-                    $http->set([
+                    $this->http = new \Swoole\Http\Server($serviceHost, $servicePort);
+                    $this->http->set([
                         'worker_num' => swoole_cpu_num() * 2,
                         'user' => 'www-data',
                         'group' => 'www-data',
@@ -89,14 +90,17 @@ Class Appswoole extends Appbase{
                         'pid_file' => $pid_file,
                         'log_file' => $log_file,
                     ]);
-                    $http->on("start", function ($server) use ($servicePort) {
+                    $this->http->on("start", function ($server) use ($servicePort) {
                         swoole_set_process_name("SilangPHP_HTTP_SERVER".$servicePort);
                     });
-                    $http->on("WorkerStart", function ($server) use ($servicePort) {
+                    $this->http->on("ManagerStart", function($server) use ($servicePort){
+                        swoole_set_process_name("SilangPHP_HTTP_SERVER".$servicePort."_manager");
+                    });
+                    $this->http->on("WorkerStart", function ($server) use ($servicePort) {
                         swoole_set_process_name("SilangPHP_HTTP_SERVER".$servicePort."_worker");
                     });
                     $app = $this;
-                    $http->on('request', function ($request, $response) use($app) {
+                    $this->http->on('request', function ($request, $response) use($app) {
                         $app->updateR($request,$response);
                         $path = $request->server['request_uri'];
                         $method = $request->server['request_method'];
@@ -109,7 +113,7 @@ Class Appswoole extends Appbase{
                         }
                         $response->end($res);
                     });
-                    $http->start();
+                    return $this->http->start();
                 }elseif($argv == 'stop'){
                     if(file_exists($pid_file))
                     {

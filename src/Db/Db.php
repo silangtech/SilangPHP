@@ -19,7 +19,7 @@ use Illuminate\Database\Capsule\Manager;
 
 /**
  * Class Db
- * 解决引用的问题，单例query
+ * laravel database
  * @package Db
  */
 class Db extends Manager

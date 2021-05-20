@@ -15,9 +15,7 @@
 */
 declare(strict_types=1);
 namespace SilangPHP;
-use Illuminate\Database\Capsule\Manager as Capsule;
-// use Illuminate\Events\Dispatcher;
-// use Illuminate\Container\Container;
+use SilangPHP\Db\Db;
 
 /**
  * Class SilangPHP
@@ -25,7 +23,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
  */
 final Class SilangPHP
 {
-    const VERSION = '1.4.0';
+    const VERSION = '1.5.0';
     
     public static $app;
     // 默认运行模式
@@ -79,7 +77,7 @@ final Class SilangPHP
         $dbconfig = \SilangPHP\Config::get("Db.mysql");
         if($dbconfig)
         {
-            self::$db = new Capsule;
+            self::$db = new Db;
             foreach($dbconfig as $connection_name => $config)
             {
                 $db_arr = [

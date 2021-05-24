@@ -1,0 +1,10 @@
+language: php
+
+php:
+  - 8.0.3
+
+env:
+  - SL_APP_DEBUG=false
+
+install:
+  - composer install --prefer-dist --optimize-autoloader --quiet

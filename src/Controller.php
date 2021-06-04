@@ -32,7 +32,7 @@ class Controller
         $this->request = SilangPHP::$app->request;
         $this->response = SilangPHP::$app->response;
     }
-
+    
     /**
      * 同个控制器，开始的时候调用
      */

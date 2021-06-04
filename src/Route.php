@@ -223,6 +223,7 @@ class Route extends \FastRoute\Route
             $ins->response = SilangPHP::$app->response;
             $found = false;
             if(method_exists($ins, $action)){
+                $runstarttime = microtime(true);
                 $ins->action = $action;
                 SilangPHP::$app->ct = $cts;
                 SilangPHP::$app->ac = $action;
@@ -286,6 +287,19 @@ class Route extends \FastRoute\Route
                     {
                         return $response2;
                     }
+                }
+                
+                if(\SilangPHP\SilangPHP::$devlog == 1)
+                {
+                    $expath = PS_RUNTIME_PATH.'/apirun/';
+                    $time = time();
+                    $finishtime = microtime(true) - $runstarttime;
+                    $exlog = "{$cts2}|{$action}|{$time}|{$finishtime}\r\n";
+                    if(!file_exists($expath))
+                    {
+                        mkdir($expath);
+                    }
+                    file_put_contents($expath.date('YmdHi').'.log', $exlog, FILE_APPEND|LOCK_EX);
                 }
                 return $response;
             }else{

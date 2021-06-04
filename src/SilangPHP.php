@@ -29,6 +29,7 @@ final Class SilangPHP
     // 默认运行模式
     public static $mode = 0;
     public static $httpmode = 0;
+    public static $devlog = 0;
     public static $cache = [];
     public static $db = null;
 
@@ -100,6 +101,11 @@ final Class SilangPHP
         }
         self::$mode = \SilangPHP\Config::get("Site.mode");
         self::$httpmode = \SilangPHP\Config::get("Site.httpmode") ?? 0;
+        self::$devlog = \SilangPHP\Config::get("Site.devlog") ?? 0;
+        if(is_array(self::$devlog))
+        {
+            self::$devlog = 0;
+        }
         if(is_array(self::$httpmode))
         {
             self::$httpmode = 0;

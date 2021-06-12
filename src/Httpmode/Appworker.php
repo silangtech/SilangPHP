@@ -28,6 +28,7 @@ Class Appworker extends Appbase{
         $this->response = new \SilangPHP\Response();
         // $this->request->hander = new \SilangPHP\Httpmode\worker\Request();
         $this->request->hander = $request;
+        $this->request->method = $this->request->hander->method();
         $this->request->gets = $this->request->hander->get();
         $this->request->posts = $this->request->hander->post();
         $this->request->header = $this->request->hander->header();

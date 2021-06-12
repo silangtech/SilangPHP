@@ -29,6 +29,7 @@ Class Appswoole extends Appbase{
         $this->request = new \SilangPHP\Request();
         $this->response = new \SilangPHP\Response();
         $this->request->hander = $request;
+        $this->request->method = $this->request->hander->server['request_method'];
         $this->request->gets = $this->request->hander->get;
         $this->request->posts = $this->request->hander->post;
         $this->request->cookies = $this->request->hander->cookie;

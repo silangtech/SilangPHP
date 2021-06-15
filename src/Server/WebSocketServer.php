@@ -32,6 +32,8 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
     public $host = '0.0.0.0';
     public $port = 9501;
     public $processName = 'SilangPHP_WsServer';
+    public $connections = [];
+    public $timers = [];
 
     public $service = [];
 
@@ -79,8 +81,8 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
         $this->on('Open', array($this, 'onOpen'));
         $this->on('Message', array($this, 'onMessage'));
         $this->on('Close', array($this, 'onClose'));
-        // http功能暂时不增加
-        // $this->on('Request', array($this, 'onRequest'));
+        // onRequest, http方法
+        $this->on('Request', array($this, 'onRequest'));
     }
 
     /**
@@ -126,6 +128,7 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
     public function onStart(\Swoole\Server $server)
     {
         swoole_set_process_name($this->processName);
+        $this->connections = [];
     }
 
     public function onWorkerStart(\Swoole\Server $server, $worker_id)
@@ -139,7 +142,14 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
     }
 
     function onOpen(\Swoole\WebSocket\Server $server, $request) {
+        // var_dump($request->get['userid']);
         echo "server: handshake success with fd{$request->fd}\n";
+        // $this->connections[$request->fd] = $request->fd;
+        // $tid = \Swoole\Timer::tick(1000, function() use ($server, $request) { 
+        //     $server->push($request->fd, "testla".time());
+        //     $server->disconnect($request->fd);
+        // });
+        // $this->timers[$request->fd] = $tid;
     }
 
     function onMessage(\Swoole\WebSocket\Server $server, $frame) {
@@ -147,18 +157,19 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
         $server->push($frame->fd, "this is server");
     }
 
-    function onClose($ser, $fd) {
+    function onClose($server, $fd) {
         echo "client {$fd} closed\n";
+        // unset($this->connections[$fd]);
+        // \Swoole\Timer::clear($this->timers[$fd]); 
+        // unset($this->timers[$fd]);
     }
 
     function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
-        global $server;//调用外部的server
         // $server->connections 遍历所有websocket连接用户的fd，给所有用户推送
-        foreach ($server->connections as $fd) {
-            // 需要先判断是否是正确的websocket连接，否则有可能会push失败
-            if ($server->isEstablished($fd)) {
-                $server->push($fd, $request->get['message']);
-            }
-        }
+        // foreach ($this->connections as $fd) {
+        //     if ($this->isEstablished($fd)) {
+        //         $this->push($fd, $request->get['message']);
+        //     }
+        // }
     }
 }

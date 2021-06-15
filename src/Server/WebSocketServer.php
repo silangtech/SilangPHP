@@ -13,9 +13,9 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
+declare(strict_types=1);
 namespace SilangPHP\Server;
-
-class Server extends \Swoole\Server implements \SilangPHP\Server\Base
+Class WebSocketServer extends \Swoole\WebSocket\Server
 {
     public $serv = null;
     public $worker_num = 2;
@@ -31,7 +31,7 @@ class Server extends \Swoole\Server implements \SilangPHP\Server\Base
     public $log_file;
     public $host = '0.0.0.0';
     public $port = 9501;
-    public $processName = 'SilangPHP_server';
+    public $processName = 'SilangPHP_WsServer';
 
     public $service = [];
 
@@ -53,14 +53,13 @@ class Server extends \Swoole\Server implements \SilangPHP\Server\Base
      */
     public function config()
     {
-        parent::__construct($this->host, $this->port, SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
+        parent::__construct($this->host, $this->port);
         $this->set([
             'worker_num' => $this->worker_num,
             'user' => $this->user,
             'group' => $this->group,
             'daemonize' => $this->daemonize,
             'backlog' => $this->backlog,
-            'task_worker_num' => $this->task_worker_num,
             'pid_file' => $this->pid_file,
             'log_file' => $this->log_file
         ]);
@@ -74,22 +73,14 @@ class Server extends \Swoole\Server implements \SilangPHP\Server\Base
     {
         // 事件
         $this->on('Start', array($this, 'onStart'));
-        $this->on('Shutdown', array($this, 'onShutdown'));
-
         $this->on('WorkerStart', array($this, 'onWorkerStart'));
-        $this->on('WorkerError', array($this, 'onWorkerError'));
-        $this->on('WorkerStop', array($this, 'onWorkerStop'));
-
         $this->on('ManagerStart', array($this, 'onManagerStart'));
-        $this->on('ManagerStop', array($this, 'onManagerStop'));
 
-        $this->on('Task', array($this, 'onTask'));
-        $this->on('Finish', array($this, 'onFinish'));
+        $this->on('Open', array($this, 'onOpen'));
+        $this->on('Message', array($this, 'onMessage'));
         $this->on('Close', array($this, 'onClose'));
-
-        $this->on('Connect', array($this, 'onConnect'));
-        $this->on('Receive', array($this, 'onReceive'));
-
+        // http功能暂时不增加
+        // $this->on('Request', array($this, 'onRequest'));
     }
 
     /**
@@ -115,7 +106,7 @@ class Server extends \Swoole\Server implements \SilangPHP\Server\Base
         {
             \Swoole\Process::kill((int)$pid, SIGTERM);
         }
-        $pid = file_put_contents($this->pid_file, "");
+        $pid = file_put_contents($this->pid_file,"");
         echo '停止成功'.PHP_EOL;
     }
 
@@ -128,7 +119,7 @@ class Server extends \Swoole\Server implements \SilangPHP\Server\Base
         $this->run();
     }
 
-    /**
+     /**
      * 开始进程
      * @param \Swoole\Server $server
      */
@@ -137,26 +128,9 @@ class Server extends \Swoole\Server implements \SilangPHP\Server\Base
         swoole_set_process_name($this->processName);
     }
 
-    public function onShutdown(\Swoole\Server $server)
-    {
-    }
-    
-
     public function onWorkerStart(\Swoole\Server $server, $worker_id)
     {
-        if($worker_id >= $server->setting['worker_num']) {
-            swoole_set_process_name($this->processName."_taskworker");
-        } else {
-            swoole_set_process_name($this->processName."_worker");
-        }
-    }
-
-    public function onWorkerError(\Swoole\Server $serv, $worker_id, $worker_pid, $exit_code, $signal)
-    {
-    }
-
-    public function onWorkerStop(\Swoole\Server $server, $worker_id)
-    {
+        swoole_set_process_name($this->processName."_worker");
     }
 
     public function onManagerStart(\Swoole\Server $serv)
@@ -164,55 +138,27 @@ class Server extends \Swoole\Server implements \SilangPHP\Server\Base
         swoole_set_process_name($this->processName."_manager");
     }
 
-    public function onManagerStop(\Swoole\Server $serv)
-    {
+    function onOpen(\Swoole\WebSocket\Server $server, $request) {
+        echo "server: handshake success with fd{$request->fd}\n";
     }
 
-    public function onTask(\Swoole\Server $serv, $task_id, $from_id, $data)
-    {
-        // 获取到数据的一个处理
+    function onMessage(\Swoole\WebSocket\Server $server, $frame) {
+        echo "receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
+        $server->push($frame->fd, "this is server");
     }
 
-    public function onFinish(\Swoole\Server $serv, $task_id, $data)
-    {
-
+    function onClose($ser, $fd) {
+        echo "client {$fd} closed\n";
     }
 
-    public function onClose(\Swoole\Server $server, $fd, $reactorId)
-    {
-    }
-
-    public function onConnect(\Swoole\Server $server, $fd, $from_id)
-    {
-    }
-
-    public function inv($name, $service)
-    {
-        $this->service[$name] = $service;
-    }
-
-    /**
-     * 接收客户端数据
-     * @param \swoole_server $server
-     * @param $fd
-     * @param $reactor_id
-     * @param $data
-     */
-    public function onReceive(\Swoole\Server $server, $fd, $reactor_id, $data)
-    {
-        // 根据信息，处理完之后返回
-        // 获取到数据后的一个处理
-        $data = json_decode($data,true);
-        $service = $data['service'];
-        $action = $data['action'];
-        $param = $data['param'];
-        if(isset($this->service[$service]))
-        {
-            $ser = $this->service[$service];
-            $res = call_user_func_array([$ser,$action],$param);
-            $server->send($fd, json_encode($res));
-        }else{
-            $server->send($fd, json_encode(['code'=>'10001','msg'=>'service error']));
+    function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
+        global $server;//调用外部的server
+        // $server->connections 遍历所有websocket连接用户的fd，给所有用户推送
+        foreach ($server->connections as $fd) {
+            // 需要先判断是否是正确的websocket连接，否则有可能会push失败
+            if ($server->isEstablished($fd)) {
+                $server->push($fd, $request->get['message']);
+            }
         }
     }
 }

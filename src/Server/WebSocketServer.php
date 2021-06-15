@@ -141,7 +141,7 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
         swoole_set_process_name($this->processName."_manager");
     }
 
-    function onOpen(\Swoole\WebSocket\Server $server, $request) {
+    public function onOpen(\Swoole\WebSocket\Server $server, $request) {
         // var_dump($request->get['userid']);
         echo "server: handshake success with fd{$request->fd}\n";
         // $this->connections[$request->fd] = $request->fd;
@@ -152,19 +152,19 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
         // $this->timers[$request->fd] = $tid;
     }
 
-    function onMessage(\Swoole\WebSocket\Server $server, $frame) {
+    public function onMessage(\Swoole\WebSocket\Server $server, $frame) {
         echo "receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
         $server->push($frame->fd, "this is server");
     }
 
-    function onClose($server, $fd) {
+    public function onClose($server, $fd) {
         echo "client {$fd} closed\n";
         // unset($this->connections[$fd]);
         // \Swoole\Timer::clear($this->timers[$fd]); 
         // unset($this->timers[$fd]);
     }
 
-    function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
+    public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
         // $server->connections 遍历所有websocket连接用户的fd，给所有用户推送
         // foreach ($this->connections as $fd) {
         //     if ($this->isEstablished($fd)) {

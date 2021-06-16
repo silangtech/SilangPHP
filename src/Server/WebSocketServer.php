@@ -33,11 +33,13 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
     public $port = 9501;
     public $processName = 'SilangPHP_WsServer';
     public $connections = [];
+    public $ssl = false;
     public $timers = [];
+    public $config = [];
 
     public $service = [];
 
-    public function __construct($serverName = '')
+    public function __construct($serverName = '', $config = [])
     {
         if(defined("PS_RUNTIME_PATH"))
         {
@@ -45,6 +47,7 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
         }else{
             $this->tmp_path = "/tmp/";
         }
+        $this->config = $config;
         $this->pid_file = $this->tmp_path.'server'.$this->port.'.pid';
         $this->log_file = $this->tmp_path.'swoole'.$this->port.'.log';
         $this->processName .= $serverName;
@@ -55,8 +58,7 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
      */
     public function config()
     {
-        parent::__construct($this->host, $this->port);
-        $this->set([
+        $setconfig = [
             'worker_num' => $this->worker_num,
             'user' => $this->user,
             'group' => $this->group,
@@ -64,7 +66,16 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
             'backlog' => $this->backlog,
             'pid_file' => $this->pid_file,
             'log_file' => $this->log_file
-        ]);
+        ];
+        if($this->ssl == true)
+        {
+            parent::__construct($this->host, $this->port, SWOOLE_PROCESS, SWOOLE_SOCK_TCP | SWOOLE_SSL);
+            $setconfig['ssl_cert_file'] = $this->config['ssl_cert_file'];
+            $setconfig['ssl_key_file'] = $this->config['ssl_key_file'];
+        }else{
+            parent::__construct($this->host, $this->port);
+        }
+        $this->set($setconfig);
     }
 
 
@@ -121,7 +132,7 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
         $this->run();
     }
 
-     /**
+    /**
      * 开始进程
      * @param \Swoole\Server $server
      */
@@ -141,7 +152,7 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
         swoole_set_process_name($this->processName."_manager");
     }
 
-    public function onOpen(\Swoole\WebSocket\Server $server, $request) {
+    function onOpen(\Swoole\WebSocket\Server $server, $request) {
         // var_dump($request->get['userid']);
         echo "server: handshake success with fd{$request->fd}\n";
         // $this->connections[$request->fd] = $request->fd;
@@ -152,19 +163,19 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
         // $this->timers[$request->fd] = $tid;
     }
 
-    public function onMessage(\Swoole\WebSocket\Server $server, $frame) {
+    function onMessage(\Swoole\WebSocket\Server $server, $frame) {
         echo "receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
         $server->push($frame->fd, "this is server");
     }
 
-    public function onClose($server, $fd) {
+    function onClose($server, $fd) {
         echo "client {$fd} closed\n";
         // unset($this->connections[$fd]);
         // \Swoole\Timer::clear($this->timers[$fd]); 
         // unset($this->timers[$fd]);
     }
 
-    public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
+    function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
         // $server->connections 遍历所有websocket连接用户的fd，给所有用户推送
         // foreach ($this->connections as $fd) {
         //     if ($this->isEstablished($fd)) {

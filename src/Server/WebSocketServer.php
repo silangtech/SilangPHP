@@ -73,7 +73,7 @@ Class WebSocketServer extends \Swoole\WebSocket\Server
             $setconfig['ssl_cert_file'] = $this->config['ssl_cert_file'];
             $setconfig['ssl_key_file'] = $this->config['ssl_key_file'];
         }else{
-            parent::__construct($this->host, $this->port);
+            parent::__construct($this->host, $this->port, SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
         }
         $this->set($setconfig);
     }

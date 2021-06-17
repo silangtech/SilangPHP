@@ -133,7 +133,7 @@ class Route extends \FastRoute\Route
                         $fastpath = call_user_func_array($handler, $argsParam );
                         if(!empty($fastpath))
                         {
-                            self::found($fastpath, $method, $vars);
+                            return self::found($fastpath, $method, $vars);
                         }
                     }else{
                         return self::found($handler, $method, $vars);

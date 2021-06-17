@@ -55,7 +55,7 @@ Class Console{
         self::changeUser($usergroup);
         self::print(self::$welcome);
         $argv = $_SERVER['argv'];
-        if($action)
+        if($action && $action != 'command')
         {
             $action = self::getAction($action);
         }else{
@@ -80,6 +80,10 @@ Class Console{
         }
 
         $controller = $action[0];
+        if(!isset($action[1]))
+        {
+            throw new \Exception("Commander action not exists");
+        }
         $action = $action[1];
         // 指定配置的读取
         $config = \SilangPHP\Config::get("Console");
@@ -109,8 +113,14 @@ Class Console{
      */
     public static function getAction($cmd)
     {
-        $cmd = trim($cmd,"/");
-        $cmd = explode("/",$cmd);
+        if(strpos($cmd, '/')!=false)
+        {
+            $cmd = trim($cmd, "/");
+            $cmd = explode("/",$cmd);
+        }else{
+            $cmd = trim($cmd, ":");
+            $cmd = explode(":",$cmd);
+        }
         return $cmd;
     }
 

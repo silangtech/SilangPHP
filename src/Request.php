@@ -126,7 +126,11 @@ class Request
      */
     public function validate($input = [], array $rules = [] , $message = [], $code = 11000)
     {
-
+        if(empty($input))
+        {
+            $input = [];
+        }
+        
         $messages = [
             'required'       => 'The :attribute field is required.',
             'email.required' => '我们需要知道你的email地址',

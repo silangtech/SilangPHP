@@ -100,7 +100,7 @@ class Log
      */
     public function debug($message, array $context = array())
     {
-        $this->log(Log::EMERGENCY, $message, $context);
+        $this->log(Log::DEBUG, $message, $context);
     }
 
     /**

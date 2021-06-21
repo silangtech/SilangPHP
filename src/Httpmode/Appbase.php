@@ -36,6 +36,7 @@ Class Appbase{
     public function __construct()
     {
         $this->config = \SilangPHP\Config::get("Site");
+        // var_dump($this->config);
         $this->logger = new Log('system');
         if($this->config)
         {
@@ -52,7 +53,7 @@ Class Appbase{
      */
     public function initialize()
     {
-        if($this->debug = '1')
+        if($this->debug == '1')
         {
             $safe_ip = '';
             if($this->debug_ip)

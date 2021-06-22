@@ -66,7 +66,7 @@ class Dbinit
                         $bingings = $query->bindings;          
                         $time = $query->time;
                         $bingingsStr = implode(",", $bingings);
-                        self::$logger->debug($sql."|".$bingingsStr."|".$time);
+                        self::$logger->debug($sql."|".$bingingsStr."|".$time."|".time());
                     });
                 }
             }

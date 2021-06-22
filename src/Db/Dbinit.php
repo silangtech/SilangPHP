@@ -61,15 +61,19 @@ class Dbinit
             {
                 foreach($dbconfig as $connection_name => $config)
                 {
+                    // 一个做监控listen
                     self::$db::Connection($connection_name)->listen(function($query){
+                    // Db::Connection('data')->listen(function($query){
                         $sql = $query->sql;
                         $bingings = $query->bindings;          
                         $time = $query->time;
                         $bingingsStr = implode(",", $bingings);
                         self::$logger->debug($sql."|".$bingingsStr."|".$time."|".time());
                     });
+                    break;
                 }
             }
         }
+        return self::$db;
     }
 }

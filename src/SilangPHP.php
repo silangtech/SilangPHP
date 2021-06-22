@@ -83,7 +83,7 @@ final Class SilangPHP
         if (defined('SLPHP_HTTPMODE')) {
             self::$httpmode = SLPHP_HTTPMODE;
         }
-        \SilangPHP\Db\Dbinit::init(self::$sqllog);
+        self::$db = \SilangPHP\Db\Dbinit::init(self::$sqllog);
         switch(self::$httpmode)
         {
             case 0:

@@ -52,7 +52,7 @@ Class Error
      */
     public static function handler_debug_error($errno, $errmsg, $filename, $linenum, $vars = [])
     {
-        if(\SilangPHP\Config::get('Site.debug') == 1)
+        if(\SilangPHP\SilangPHP::$app->debug == 1)
         {
             // 这里直接输出了
             $err = self::debug_format_errmsg('debug', $errno, $errmsg, $filename, $linenum, $vars);
@@ -196,7 +196,7 @@ Class Error
      */
     public static function show_debug_error()
     {
-        if(\SilangPHP\Config::get('Site.debug') == 0)
+        if(\SilangPHP\SilangPHP::$app->debug == 0)
         {
             return '';
         }

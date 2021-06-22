@@ -57,14 +57,14 @@ Class AppswooleCo extends Appbase{
             if(empty($this->appDir))
             {
                 return false;
-            }else{
-                $this->initialize();
             }
             // 运行数据或启动服务
             if($pathinfo == 'command')
             {
+                $this->initialize(1);
                 return \SilangPHP\Console::start();
             }else{
+                $this->initialize();
                 $frameconfig = $this->config;
                 $serviceHost = $frameconfig['host'] ?? '0.0.0.0';
                 $servicePort = $frameconfig['port'] ?? 8080;

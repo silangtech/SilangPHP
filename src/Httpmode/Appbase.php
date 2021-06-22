@@ -51,8 +51,13 @@ Class Appbase{
     /**
      * http初始化
      */
-    public function initialize()
+    public function initialize($constraint = 0)
     {
+        // 强制debug,一般command用到
+        if($constraint == 1)
+        {
+            $this->debug = 1;
+        }
         if($this->debug == '1')
         {
             $safe_ip = '';

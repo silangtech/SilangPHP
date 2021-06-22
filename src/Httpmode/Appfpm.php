@@ -42,13 +42,13 @@ Class Appfpm extends Appbase{
             if(empty($this->appDir))
             {
                 return false;
-            }else{
-                $this->initialize();
             }
             if(run_mode == '2')
             {
+                $this->initialize(1);
                 return \SilangPHP\Console::start($pathinfo);
             }else{
+                $this->initialize();
                 $this->updateR();
                 $method = $_SERVER['REQUEST_METHOD'];
                 if(!empty($pathInfo)){

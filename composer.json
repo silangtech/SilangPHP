@@ -17,6 +17,7 @@
         "illuminate/database": "v8.24.0",
         "illuminate/validation": "v8.24.0",
         "illuminate/pagination": "v8.24.0",
+        "illuminate/events": "v8.24.0",
         "workerman/workerman": "4.0.18",
         "nesbot/carbon": "2.31",
         "symfony/cache": "v5.2.6"

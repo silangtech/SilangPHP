@@ -58,7 +58,7 @@ Class Appbase{
             $safe_ip = '';
             if($this->debug_ip)
             {
-                $safe_ip = explode(",",$this->debug_ip);
+                $safe_ip = explode(",", $this->debug_ip);
             }
             $debug = 1;
             // 开启ip的情况

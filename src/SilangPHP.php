@@ -15,7 +15,6 @@
 */
 declare(strict_types=1);
 namespace SilangPHP;
-use SilangPHP\Db\Db;
 
 /**
  * Class SilangPHP
@@ -23,13 +22,14 @@ use SilangPHP\Db\Db;
  */
 final Class SilangPHP
 {
-    const VERSION = '1.5.0';
+    const VERSION = '1.5.5';
     
     public static $app;
     // 默认运行模式
     public static $mode = 0;
     public static $httpmode = 0;
     public static $devlog = 0;
+    public static $sqllog = 0;
     public static $cache = [];
     public static $db = null;
 
@@ -75,44 +75,15 @@ final Class SilangPHP
         {
             require_once(PS_CONFIG_PATH.'/define.php');
         }
-        $dbconfig = \SilangPHP\Config::get("Db.mysql");
-        if($dbconfig)
-        {
-            self::$db = new Db;
-            foreach($dbconfig as $connection_name => $config)
-            {
-                $db_arr = [
-                    'driver'    => $config['dbtype'] ?? 'mysql', 
-                    'host'      => $config['host'],
-                    'port'      => $config['port'],
-                    'database'  => $config['dbname'],
-                    'username'  => $config['username'],
-                    'password'  => $config['password'],
-                    'charset'   => $config['charset'] ?? 'utf8',
-                    'collation' => $config['collation'] ?? 'utf8_general_ci',
-                    'prefix'    => '',
-                ];
-                self::$db->addConnection($db_arr,$connection_name);
-            }
-            // self::$db->setEventDispatcher(new Dispatcher(new Container));
-            self::$db->setFetchMode(\PDO::FETCH_ASSOC);
-            self::$db->setAsGlobal();
-            self::$db->bootEloquent();
-        }
-        self::$mode = \SilangPHP\Config::get("Site.mode");
-        self::$httpmode = \SilangPHP\Config::get("Site.httpmode") ?? 0;
-        self::$devlog = \SilangPHP\Config::get("Site.devlog") ?? 0;
-        if(is_array(self::$devlog))
-        {
-            self::$devlog = 0;
-        }
-        if(is_array(self::$httpmode))
-        {
-            self::$httpmode = 0;
-        }
+        $siteconfig = \SilangPHP\Config::get("Site");
+        self::$mode = $siteconfig['mode'] ?? 0;
+        self::$httpmode = $siteconfig['httpmode'] ?? 0;
+        self::$devlog = $siteconfig['devlog'] ?? 0;
+        self::$sqllog = $siteconfig['sqllog'] ?? 0;
         if (defined('SLPHP_HTTPMODE')) {
             self::$httpmode = SLPHP_HTTPMODE;
         }
+        \SilangPHP\Db\Dbinit::init();
         switch(self::$httpmode)
         {
             case 0:

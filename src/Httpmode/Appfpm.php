@@ -20,6 +20,7 @@ use SilangPHP\Log;
 
 Class Appfpm extends Appbase{
     public $appname = 'fpm';
+
     /**
      * 更新双R
      */

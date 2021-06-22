@@ -116,7 +116,7 @@ class Response
      */
     public function header($key, $value = '')
     {
-        if($this->hander)
+        if(is_object($this->hander))
         {
             if(method_exists($this->hander,'header'))
             {
@@ -167,7 +167,7 @@ class Response
      */
     public function write($data = '')
     {
-        if($this->hander)
+        if(is_object($this->hander))
         {
             if(method_exists($this->hander,'write'))
             {
@@ -185,7 +185,7 @@ class Response
      */
     public function send($data = '')
     {
-        if($this->hander)
+        if(is_object($this->hander))
         {
             if(method_exists($this->hander,'send'))
             {

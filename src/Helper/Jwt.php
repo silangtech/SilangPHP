@@ -25,6 +25,18 @@ class Jwt
     // 默认的公钥，新的项目请更新一下
     public $publicKey = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzMxtjcelS2iZ17egEhg6ogbGYOECGpYCHPC4W4LmrYS9e/A/W8ZcLbe2iLJ/phu46WHimpGM4yTRRlXEVs9G419ScFxVbOoEFV72tCa9/w5x0T9lcIUTDxXo7DpGlNrpRPtU/KucdLZ1zaqtpMCEzTtkyOgh8WE+8AZVVa/LvmnC/LJTsXuDGaHcoDLhqXlnowA06e8k/s59YeyakcH7/tts0tCMwcU6IhgjcKUhRNuG55U6uFMaELsHN/PU5FNnRTRjtHZyXuxeM3WBZbJbw9BXKnTnV1iyZ5ml4bkffEYldQS//jVdR0Y1DWopaTYzkVSdHh9pzZE/PkZuQY/8jQIDAQAB';
 
+    public function __construct($config = [])
+    {
+        if(isset($config['privateKey']))
+        {
+            $this->privateKey = $config['privateKey'];
+        }
+        if(isset($config['publicKey']))
+        {
+            $this->publicKey = $config['publicKey'];
+        }
+    }
+
     /**
      * 设置privateKey
      * @param $privateKey
@@ -81,7 +93,7 @@ class Jwt
      * jti 编号
      * 自定义：使用nbf和exp就ok
      */
-    public function decode($jwt, $key = '')
+    public function decode($jwt, $key = '', $retArr = false)
     {
         if(empty($key))
         {
@@ -132,6 +144,10 @@ class Jwt
         }else{
             //一定要加过期时间,exp必填项
             return false;
+        }
+        if($retArr)
+        {
+            $payload = (array)$payload;
         }
         return $payload;
     }

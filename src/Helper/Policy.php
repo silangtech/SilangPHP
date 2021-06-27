@@ -33,7 +33,7 @@ class Policy{
      * @param $path
      * @param $op
      */
-    public function node($path,$op=Policy::P_UNKNOWN)
+    public function node($path, $op=Policy::P_UNKNOWN)
     {
         $node = new class{
             public $name = "";
@@ -61,19 +61,20 @@ class Policy{
     /**
      * 添加权限
      */
-    public function add($path,$op = Policy::P_ALLOW)
+    public function add($path, $op = Policy::P_ALLOW)
     {
-        $path = trim($path,"/");
-        $path = explode("/",$path);
+        $path = trim($path, "/");
+        $path = explode("/", $path);
         if($path)
         {
             $temp = $this->root;
             foreach($path as $lowpath)
             {
+                $lowpath = strtolower($lowpath);
                 if(!isset($temp->leaf[$lowpath]))
                 {
                     // 一路向下
-                    $tmp = $this->node($lowpath,Policy::P_UNKNOWN);
+                    $tmp = $this->node($lowpath, Policy::P_UNKNOWN);
                 }else{
                     $tmp = $temp->leaf[$lowpath];
                 }
@@ -87,11 +88,11 @@ class Policy{
     /**
      * 检查权限
      */
-    public function check($path,$parent_op = '')
+    public function check($path)
     {
         $path = strtolower($path);
         $parentop = Policy::P_UNKNOWN;
-        $path = explode("/",trim($path,"/"));
+        $path = explode("/", trim($path, "/"));
         $root = $this->root;
         while($leaf = array_shift($path))
         {

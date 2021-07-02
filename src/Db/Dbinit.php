@@ -66,13 +66,10 @@ class Dbinit
                     // Db::Connection('data')->listen(function($query){
                         $sql = $query->sql;
                         $bingings = $query->bindings;          
-                        $time = $query->time;
-                        // $bingingsStr = implode(",", $bingings);
-                        // self::$logger->debug($sql."|".$bingingsStr."|".$time."|".time());
-
+                        $time = $query->time / 1000;
                         $sqlStr = vsprintf(str_replace(array('?'), array("'%s'"), $sql), $bingings);
-                        self::$logger->debug($sqlStr . "; time({$time})" . "|" . time());
-                        
+                        self::$logger->debug($sqlStr . "; time({$time} s)" . "|" . time());
+
                     });
                     break;
                 }

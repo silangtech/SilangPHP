@@ -288,18 +288,18 @@ class Route extends \FastRoute\Route
                         return $response2;
                     }
                 }
-                
                 if(\SilangPHP\SilangPHP::$devlog == 1)
                 {
-                    $expath = PS_RUNTIME_PATH.'/apirun/';
+                    $expath = PS_RUNTIME_PATH."/apirun/{$cts2}_{$action}/";
                     $time = time();
+                    $ip = \SilangPHP\Helper\Util::get_client_ip();
                     $finishtime = microtime(true) - $runstarttime;
-                    $exlog = "{$cts2}|{$action}|{$time}|{$finishtime}\r\n";
+                    $exlog = "{$ip}|{$time}|{$finishtime}\r\n";
                     if(!file_exists($expath))
                     {
                         mkdir($expath);
                     }
-                    file_put_contents($expath.date('YmdHi').'.log', $exlog, FILE_APPEND|LOCK_EX);
+                    file_put_contents($expath.date('Ymd').'.log', $exlog, FILE_APPEND|LOCK_EX);
                 }
                 return $response;
             }else{

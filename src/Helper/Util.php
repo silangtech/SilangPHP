@@ -203,4 +203,89 @@ class Util
         return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
     }
 
+    /**
+     * 查看api接口情况
+     * 此情况要开启devlog
+     * @param integer $mode [1天|2时|3分|4秒]
+     * @param string $nowdate
+     * @return void
+     */
+    public function apirun($mode = 1, $nowdate = '')
+    {
+        // 按天模式
+        if(empty($nowdate))
+        {
+            $nowdate = date("Ymd");
+        }
+        $nowdate = $nowdate.".log";
+        $path = PS_RUNTIME_PATH."/apirun/";
+        $apiresult = [];
+        foreach (new \DirectoryIterator($path) as $fileInfo) {
+            if($fileInfo->isDot()) continue;
+            if($fileInfo->isDir())
+            {
+                $spath = $fileInfo->getPathname();
+                $module = $fileInfo->getFilename();
+                $subPath = new \DirectoryIterator($spath);
+                foreach($subPath as $file)
+                {
+                    if($file->isDot()) continue;
+                    if($file->getFilename() == $nowdate)
+                    {
+                        $handle = @fopen($spath."/".$nowdate, "r");
+                        if ($handle) {
+                            while (($buffer = fgets($handle, 4096)) !== false) {
+                                $barr = explode("|", trim($buffer));
+                                switch($mode)
+                                {
+                                    case 1:
+                                        $dkey = date("Ymd", $barr[1]);
+                                        break;
+                                    case 2:
+                                        $dkey = date("YmdH", $barr[1]);
+                                        break;
+                                    case 3:
+                                        $dkey = date("YmdH:i", $barr[1]);
+                                        break;
+                                    case 4:
+                                        $dkey = date("YmdH:i:s", $barr[1]);
+                                        break;
+                                    default:
+                                        $dkey = date("Ymd", $barr[1]);
+                                        break;
+                                }
+
+                                if(!isset($apiresult[$module][$dkey]))
+                                {
+                                    $apiresult[$module][$dkey] = 0;
+                                }
+                                $apiresult[$module][$dkey] += 1;
+                            }
+                            
+                            if (!feof($handle)) {
+                                echo "Error: unexpected fgets() fail\n";
+                            }
+                            fclose($handle);
+                        }
+                        
+                    }
+                }
+            }
+        }
+
+        foreach($apiresult as $module => $mdata)
+        {
+            ksort($apiresult[$module]);
+        }
+        echo '查看模式'.$mode.lr;
+        foreach($apiresult as $module => $mdata)
+        {
+            echo "[".$module."]".lr;
+            foreach($mdata as $index => $indexnum)
+            {
+                echo $index."请求".$indexnum.lr;
+            }
+        }
+    }
+
 }

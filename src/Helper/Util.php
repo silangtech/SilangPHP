@@ -93,7 +93,7 @@ class Util
     /**
      * 生成盐
      */
-    public function generateSalt($length = 12,$chars = null){
+    public static function generateSalt($length = 12,$chars = null){
         if( empty($chars) ){
           $chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
         }
@@ -210,7 +210,7 @@ class Util
      * @param string $nowdate
      * @return void
      */
-    public function apirun($mode = 1, $nowdate = '')
+    public static function apirun($mode = 1, $nowdate = '')
     {
         // 按天模式
         if(empty($nowdate))

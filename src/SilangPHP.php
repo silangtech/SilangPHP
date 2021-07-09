@@ -22,7 +22,7 @@ namespace SilangPHP;
  */
 final Class SilangPHP
 {
-    const VERSION = '1.5.5';
+    const VERSION = '1.5.6';
     
     public static $app;
     // 默认运行模式

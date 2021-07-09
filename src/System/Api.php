@@ -25,7 +25,7 @@ Class Api
     public $input;
     public function look()
     {
-        $mode = $this->input['date'] ?? 1;
+        $mode = $this->input['mode'] ?? 1;
         $date = $this->input['date'] ?? date("Ymd");
         \SilangPHP\Helper\Util::apirun($mode, $date);
     } 

@@ -91,7 +91,16 @@ Class Console{
         {
             $controller = $config[$controller];
         }
-        $cls = PS_APP_NAME.'\\Command\\'. $controller . 'Commander';
+        // 调用系统内部服务
+        if(substr($controller, 0, 6) == 'System')
+        {
+            $controller = substr($controller, 6);
+            echo $controller.PHP_EOL;
+            $cls = '\\SilangPHP\\System\\'.$controller;
+        }else{
+            $cls = PS_APP_NAME.'\\Command\\'. $controller . 'Commander';
+        }
+        
         if(!class_exists($cls)){
             throw new \Exception("Commander $cls not found!");
         }

@@ -22,7 +22,7 @@ namespace SilangPHP;
  */
 final Class SilangPHP
 {
-    const VERSION = '1.5.6';
+    const VERSION = '1.5.7';
     
     public static $app;
     // 默认运行模式
@@ -119,6 +119,10 @@ final Class SilangPHP
             {
                 $result = $e->getMessage();
                 self::$app->logger->error("run:".$result);
+                if(is_null(json_decode($result)) && (self::$app->debug == 0) )
+                {
+                    $result = 'error:4044';
+                }
                 if(self::$app->response)
                 {
                     self::$app->response->end($result);

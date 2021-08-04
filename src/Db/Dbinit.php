@@ -67,7 +67,10 @@ class Dbinit
                         $sql = $query->sql;
                         $bingings = $query->bindings;          
                         $time = $query->time / 1000;
-                        $sqlStr = vsprintf(str_replace(array('?'), array("'%s'"), $sql), $bingings);
+                        $sqlStr = str_replace(array('?'), array("'_binging_v_'"), $sql);
+                        foreach($bingings as $v){
+                            $sqlStr = preg_replace('/_binging_v_/', strval($v), $sqlStr, 1);
+                        }
                         self::$logger->debug($sqlStr . "; time({$time} s)" . "|" . time());
 
                     });

@@ -77,7 +77,7 @@ class Mysql
             }catch(Exception $e)
             {
                 $message = $e->getMessage();
-                throw new dbException(1,$message,$sql);
+                throw new dbException(1,$message, $sql);
             }
             $endtime = microtime(true);
             $lasttime = $endtime - $starttime;
@@ -125,6 +125,7 @@ class Mysql
      */
     public function get_all(string $sql = '')
     {
+        $row = false;
         $result = $this->query($sql);
         if($result)
         {
@@ -141,7 +142,7 @@ class Mysql
     public function get_big_all(string $sql = '')
     {
         $result = $this->query($sql);
-        while($row=$result->fetch($result,\PDO::FETCH_ASSOC)) {
+        while($row = $result->fetch($result,\PDO::FETCH_ASSOC)) {
             yield $row;
         }
     }

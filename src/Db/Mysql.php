@@ -24,6 +24,7 @@ use SilangPHP\SilangPHP;
 
 /**
  * 最简单的mysql db类
+ * 轻量，够快！
  */
 class Mysql
 {
@@ -63,17 +64,67 @@ class Mysql
     }
 
     /**
+     * exec
+     *When using PDO::EXEC the result returned is not of an PDOStatement but an integer of the rows affected.
+     * @param string $sql
+     */
+    public function exec(string $sql = '')
+    {
+        $result = $this->pdo->exec($sql);
+        return $result;
+    }
+
+    /**
+     * 最后插入的id
+     *
+     * @return string
+     */
+    public function last_insert_id()
+    {
+        return $this->insert_id();
+    }
+
+    public function begin()
+    {
+        return $this->pdo->beginTransaction();
+    }
+
+    public function rollback()
+    {
+        return $this->pdo->rollBack();
+    }
+
+    public function commit()
+    {
+        return $this->pdo->commit();
+    }
+
+    /**
+     * 获取错误提示
+     *
+     * @return string
+     */
+    public function error()
+    {
+        $error = '';
+        if ($this->pdo) {
+            $error = $this->pdo->errorInfo()[2];
+        }
+        return $error;
+    }
+
+    /**
      * 执行mysql处理
+     * When using PDO::QUERY the result returned is a PDOStatement.
      * @param $sql
      */
     public function query(string $sql = '')
     {
-        $result = '';
+        $statement = null;
         try{
             $starttime = microtime(true);
-            $result = false;
             try{
-                $result = $this->pdo->query($sql);
+                $statement = $this->pdo->query($sql);
             }catch(Exception $e)
             {
                 $message = $e->getMessage();
@@ -81,15 +132,14 @@ class Mysql
             }
             $endtime = microtime(true);
             $lasttime = $endtime - $starttime;
-            if (!$result) {
+            if (!$statement) {
                 //调试模式才能显示 查看语句的时效
                 if(SilangPHP::$app->debug == 1)
                 {
-                    echo $sql.lr;
-                    echo "sql_time:".$lasttime.lr;
+                    $this->logger->debug($sql."sql_time:".$lasttime);
                 }
             }
-            return $result;
+            return $statement;
         }catch(dbException $e)
         {
             if(SilangPHP::$app->debug == 1)
@@ -98,7 +148,12 @@ class Mysql
                 // echo $e->getSql();
             }
         }
-        return $result;
+        return $statement;
+    }
+
+    public function close()
+    {
+        $this->pdo = null;
     }
 
     /**
@@ -154,6 +209,47 @@ class Mysql
     public function insert_id()
     {
         return $this->pdo->lastInsertId();
+    }
+
+    public function insert($table, array $values, $fields = null)
+    {
+        if (!count($values)) {
+            return false;
+        }
+        if (is_array($fields)) {
+            $insert_sql = "INSERT INTO $table (".join(',', $fields).') VALUES ('.join(',', $values).')';
+        } else {
+            $insert_sql = "INSERT INTO $table VALUES (".join(',', $values).')';
+        }
+        return $this->exec($insert_sql);
+    }
+    
+
+    public function update($table, array $fields, array $values, $where_condition = null)
+    {
+        $update_sql = "UPDATE $table SET ";
+        if (count($fields) !== count($values)) {
+            return false;
+        }
+        $i = 0;
+        $update_values = array();
+        foreach ($fields as $field) {
+            $update_values[] = $field.' = '.$values[$i];
+            ++$i;
+        }
+        $update_sql .= join(',', $update_values);
+        if ($where_condition != null) {
+            $update_sql .= " WHERE $where_condition";
+        }
+        return $this->exec($update_sql);
+    }
+
+    public function delete($table, $where_condition)
+    {
+        if ($where_condition) {
+            return $this->exec("DELETE FROM $table WHERE $where_condition");
+        }
+        return $this->exec("DELETE FROM $table");
     }
 
 }

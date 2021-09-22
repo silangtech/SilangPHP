@@ -67,11 +67,9 @@ class Process
         $this->masterId = getmypid();
         echo "parent_id:".$this->masterId."\n";
         file_put_contents($this->pid_file,$this->masterId);
-
+        cli_set_process_title($this->processName);
         // 运行里面的逻辑
         $this->process();
-
-        cli_set_process_title($this->processName);
         $this->processWait();
     }
 

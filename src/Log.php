@@ -70,7 +70,8 @@ class Log
         $date = date("YmdH");
         if($this->type == 'text')
         {
-            $text = "[{$level}]".$this->interpolate($message, $context);
+            // 增加回时间显示
+            $text = "[{$level}]".date("Y-m-d H:i:s")."|".$this->interpolate($message, $context);
         }elseif($this->type == 'json')
         {
             $text = json_encode($record);

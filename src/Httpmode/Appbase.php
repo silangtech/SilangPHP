@@ -48,6 +48,14 @@ Class Appbase{
         }
     }
 
+    public function getRequest(){
+        return $this->request;
+    }
+
+    public function getResponse(){
+        return $this->response;
+    }
+
     /**
      * http初始化
      */

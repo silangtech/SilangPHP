@@ -22,7 +22,7 @@ namespace SilangPHP;
  */
 final Class SilangPHP
 {
-    const VERSION = '1.5.7';
+    const VERSION = '1.5.8';
     
     public static $app;
     // 默认运行模式
@@ -47,6 +47,10 @@ final Class SilangPHP
     public static function set($key, $value)
     {
         self::$cache[$key] = $value;
+    }
+
+    public static function i(){
+        return self::$app;
     }
 
     /**

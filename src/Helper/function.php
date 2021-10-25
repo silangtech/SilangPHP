@@ -110,3 +110,15 @@ if (!function_exists('config'))
         return \SilangPHP\Config::get($key);
     }
 }
+
+// 增加env函数
+if (!function_exists('env'))
+{
+    /**
+     * getenv的别名
+     */
+    function env($key)
+    {
+        return getenv($key);
+    }
+}

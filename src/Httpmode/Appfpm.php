@@ -28,8 +28,8 @@ Class Appfpm extends Appbase{
     {
         $this->request = new \SilangPHP\Request();
         $this->response = new \SilangPHP\Response();
-        \SilangPHP\Di::instance()->set(\SilangPHP\Request::class,$this->request);
-        \SilangPHP\Di::instance()->set(\SilangPHP\Response::class,$this->response);
+        \SilangPHP\Di::instance()->set(\SilangPHP\Request::class, $this->request);
+        \SilangPHP\Di::instance()->set(\SilangPHP\Response::class, $this->response);
     }
 
     /**

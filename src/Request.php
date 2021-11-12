@@ -16,7 +16,6 @@
 declare(strict_types=1);
 namespace SilangPHP;
 
-
 class Request
 {
     // 用户的cookie
@@ -50,7 +49,7 @@ class Request
 
     public function __construct()
     {
-        if(SilangPHP::$httpmode == 0)
+        if(\SilangPHP\SilangPHP::$http == 1)
         {
             $this->posts = $_POST ?? [];
             $this->gets = $_GET ?? [];
@@ -118,7 +117,7 @@ class Request
     /**
      * 校验数据
      * 默认返回错误码为11000
-     * 
+     * 注:使用此方法请加载（illuminate/validation": "v8.24.0"）
      * @param array $input
      * @param [type] $rules
      * @param integer $erorcode
@@ -237,6 +236,7 @@ class Request
      */
     public function item($formname, $defaultvalue = '', $filter_type='')
     {
+        // 因为获取有可能是0的情况，所以不判断为空
         if( isset( $this->posts[$formname] ) ) {
             return $this->filter($this->posts[$formname], $filter_type);
         }elseif( isset( $this->gets[$formname] ) ) {
@@ -252,7 +252,7 @@ class Request
      * @param $value
      * @param string $type
      */
-    public function filter($value,$type = '')
+    public function filter($value, $type = '')
     {
         switch($type)
         {
@@ -270,6 +270,4 @@ class Request
         }
         return $value;
     }
-
-
 }

@@ -13,9 +13,21 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
-declare(strict_types=1);
-namespace SilangPHP\Httpmode\worker;
-class Request extends \Workerman\Protocols\Http\Request
-{
+declare(strict_types = 1);
+namespace SilangPHP;
 
+Class Context
+{
+    public $id;
+    public $request;
+    public $response;
+    public $route;
+    public $hander;
+    public $vars;
+
+    public function __construct($request, $response, $id = ''){
+        $this->request = $request;
+        $this->response = $response;
+        $this->id = $id;
+    }
 }

@@ -13,8 +13,7 @@
 | Supports: http://www.github.com/silangtech/SilangPHP                  |
 +-----------------------------------------------------------------------+
 */
-namespace SilangPHP\Server;
-
+namespace SilangPHP;
 /**
  * 进程处理
  */
@@ -26,8 +25,6 @@ class Process
     public $workers = [];
     public $masterId = '';
     public $processName = "";
-
-
     public function __construct($serverName = '')
     {
         if(defined("PS_RUNTIME_PATH"))

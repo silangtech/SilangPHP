@@ -152,7 +152,7 @@ class Response
     {
         if(is_object($this->hander))
         {
-            if(method_exists($this->hander,'end'))
+            if(method_exists($this->hander, 'end'))
             {
                 $this->hander->end($data);
             }
@@ -169,7 +169,7 @@ class Response
     {
         if(is_object($this->hander))
         {
-            if(method_exists($this->hander,'write'))
+            if(method_exists($this->hander, 'write'))
             {
                 $this->hander->write($data);
             }
@@ -187,7 +187,7 @@ class Response
     {
         if(is_object($this->hander))
         {
-            if(method_exists($this->hander,'send'))
+            if(method_exists($this->hander, 'send'))
             {
                 $this->hander->send($data);
             }
@@ -207,7 +207,7 @@ class Response
      * @param string $msg
      * @param string $data
      */
-    public function returnArray($code='0', $msg='', $data='')
+    public function returnArray($code = '0', $msg = '', $data = '')
     {
         $result = array(
             'code' => $code,

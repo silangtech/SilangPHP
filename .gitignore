@@ -4,3 +4,5 @@ App
 Config
 Runtime
 Public
+bin
+composer.lock

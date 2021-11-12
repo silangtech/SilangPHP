@@ -15,19 +15,25 @@
 */
 declare(strict_types=1);
 namespace SilangPHP;
-use SilangPHP\Traits\Instance;
 Class Config
 {
-    use Instance;
     //框架配置文件
     public $config = [];
     public $envconfig = [];
+    static private $instance;
+    static public function instance()
+    {
+        if (!self::$instance instanceof self) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
 
     /**
      * 初始化配置
      * 先要引进文件
      */
-    public static function include($filename = '',$reload = false):void
+    public static function include($filename = '', $reload = false):void
     {
         if(!empty($filename))
         {
@@ -62,7 +68,7 @@ Class Config
      */
     public static function get($key)
     {
-        $keys = explode(".",$key);
+        $keys = explode(".", $key);
         $count = count($keys);
 
         if($count>1)
@@ -96,14 +102,14 @@ Class Config
     /**
      * 递归设置数据
      */
-    public static function walk_key($data,$keys,$value)
+    public static function walk_key($data, $keys, $value)
     {
         $ckey = array_shift($keys);
         if(empty($keys))
         {
             return $value;
         }else{
-            $tmp = self::walk_key($data,$keys,$value);
+            $tmp = self::walk_key($data, $keys, $value);
             $data[$ckey] = $tmp;
         }
         return $data;
@@ -122,22 +128,21 @@ Class Config
         {
             $config_name = array_shift($keys);
             $data = self::instance()->config[$config_name];
-            $data = self::walk_key($data,$keys,$value);
+            $data = self::walk_key($data, $keys, $value);
         }else{
             $config_name = $keys;
             $data = self::instance()->config[$keys] = $value;
         }
         //只能生成在应用层config
-        file_put_contents(PS_CONFIG_PATH.$config_name.".php",$data);
+        file_put_contents(PS_CONFIG_PATH.$config_name.".php", $data);
     }
 
     /**
      * env文件加载
      */
-    public static function env()
+    public static function env($envPath = '.env')
     {
-        $envPath = PS_ROOT_PATH.'/.env';
-        $env = parse_ini_file($envPath,true);
+        $env = parse_ini_file($envPath, true);
         self::$envconfig = $env;
         return $env;
     }

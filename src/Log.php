@@ -52,7 +52,7 @@ class Log
     /**
      * 记录log
      */
-    public function log($level, $message, array $context = array())
+    public function log($level = '', $message = '', array $context = [])
     {
         $record = [
             'level'   => $level,
@@ -99,15 +99,15 @@ class Log
     /**
      * debug日志
      */
-    public function debug($message, array $context = array())
+    public function debug($message = '', array $context = array())
     {
-        $this->log(Log::DEBUG, $message, $context);
+        $this->log(Log::DEBUG, $message = '', $context);
     }
 
     /**
      * info日志
      */
-    public function info($message, array $context = array())
+    public function info($message = '', array $context = array())
     {
         $this->log(Log::INFO, $message, $context);
     }
@@ -115,7 +115,7 @@ class Log
     /**
      * notice日志
      */
-    public function notice($message, array $context = array())
+    public function notice($message = '', array $context = array())
     {
         $this->log(Log::NOTICE, $message, $context);
     }
@@ -123,7 +123,7 @@ class Log
     /**
      * error日志
      */
-    public function error($message, array $context = array())
+    public function error($message = '', array $context = array())
     {
         $this->log(Log::ERROR, $message, $context);
     }
@@ -131,7 +131,7 @@ class Log
     /**
      * critical日志
      */
-    public function critical($message, array $context = array())
+    public function critical($message = '', array $context = array())
     {
         $this->log(Log::CRITICAL, $message, $context);
     }
@@ -139,7 +139,7 @@ class Log
     /**
      * alert日志
      */
-    public function alert($message, array $context = array())
+    public function alert($message = '', array $context = array())
     {
         $this->log(Log::ALERT, $message, $context);
     }
@@ -147,7 +147,7 @@ class Log
     /**
      * emergency日志
      */
-    public function emergency($message, array $context = array())
+    public function emergency($message = '', array $context = array())
     {
         $this->log(Log::EMERGENCY, $message, $context);
     }
@@ -188,5 +188,4 @@ class Log
         $tmp = mkdir($path, 0777, true);
         return $tmp;
     }
-
 }

@@ -1,5 +1,5 @@
 # SilangPHP
-SilangPHP是一款极简http组件，提示Api、Service模式。
+SilangPHP是一款极简http组件，支持Api、Service模式。
 
 # 说明
 非标准化http-message, 路由使用fastroute结合
@@ -26,7 +26,7 @@ addGroup(前缀，Callable, middleware);
 ```PHP
 \SilangPHP\Route::use(funciton($c){
     // 逻辑前
-    \SilangPHP\Route::next();
+    \SilangPHP\Route::next($c);
     // 逻辑后
 });
 

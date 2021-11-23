@@ -35,46 +35,15 @@ _________.__.__                       __________  ___ _____________
     // 默认运行模式
     public static $cache = [];
     public static $devlog = 0;
-    protected $dbpool;
-    private $stack = [];
-    private $top = -1;
+    protected static $dbpool;
+    protected static $container = false;
+    private static $stack = [];
+    private static $top = -1;
     public static $action = [];
     public static $input = '';
     public static $output;
     public static $user = 'www-data';
-    protected static $container = false;
     public static $http = 1;
-
-    /**
-     * 获取ip
-     *
-     * @return void
-     */
-    public static function ip()
-    {
-        if(isset(\SilangPHP\SilangPHP::$app->request->header['x-real-ip']))
-        {
-            return \SilangPHP\SilangPHP::$app->request->header['x-real-ip'];
-        }
-        if( isset(\SilangPHP\SilangPHP::$app->request->header['x-forwarded-for']) )
-        {
-            $arr = explode(',', \SilangPHP\SilangPHP::$app->request->header['x-forwarded-for']);
-            foreach ($arr as $ip)
-            {
-                $ip = trim($ip);
-                if ($ip != 'unknown' ) {
-                    $client_ip = $ip; break;
-                }
-            }
-        }
-        else
-        {
-            $client_ip = isset(\SilangPHP\SilangPHP::$app->request->server['remote_addr']) ? \SilangPHP\SilangPHP::$app->request->server['remote_addr'] : '';
-        }
-        preg_match("/[\d\.]{7,15}/", $client_ip, $onlineip);
-        $client_ip = ! empty($onlineip[0]) ? $onlineip[0] : '0.0.0.0';
-        return $client_ip;
-    }
 
     /**
      * 输出
@@ -89,33 +58,33 @@ _________.__.__                       __________  ___ _____________
     /**
      * 入栈
      */
-    public function push($data)
+    public static function push($data)
     {
-        $this->top = ++$this->top;
-        $this->stack[$this->top] = $data;
+        self::$top = ++self::$top;
+        self::$stack[self::$top] = $data;
     }
     /**
      * 出栈
      */
-    public function pop()
+    public static function pop()
     {
-        if($this->top == -1){
+        if(self::$top == -1){
             return false;
         }
-        $tmp = $this->stack[$this->top];
-        $this->top = --$this->top;
+        $tmp = self::$stack[self::$top];
+        self::$top = --self::$top;
         return $tmp;
 
     }
     
-    public function create($size = 20, $middle = null)
+    public static function create($size = 20, $middle = null)
     {
         // 生成池中内容
         for ($i = 0; $i < $size; $i++)
         {
             if($middle)
             {
-                $this->put($middle);
+                self::put($middle);
             }
         }
     }
@@ -124,18 +93,18 @@ _________.__.__                       __________  ___ _____________
      * 添加
      * @param $middle
      */
-    function put($middle)
+    public static function put($middle)
     {
-        $this->dbpool->push($middle);
+        static::$dbpool->push($middle);
     }
 
     /**
      * 获取
      * @return bool|mixed
      */
-    function get()
+    public static function get()
     {
-        return $this->dbpool->pop();
+        return static::$dbpool->pop();
     }
 
     /**
@@ -306,13 +275,7 @@ _________.__.__                       __________  ___ _____________
             $err .= "</font><br />\n";
         }
         $err .= $log_type=='debug' ? "</div>\n" : "------------------------------------------\n";
-        // 直接输出就ok了
-        if(\SilangPHP\SilangPHP::$app->response)
-        {
-            \SilangPHP\SilangPHP::$app->response->write($err);
-        }else{
-            echo $err;
-        }
+        echo $err;
     }
 
     /**
@@ -489,25 +452,6 @@ _________.__.__                       __________  ___ _____________
             return self::$container[$abstract];
         }
         return call_user_func_array(self::$container[$abstract], $parameters);
-    }
-
-    /**
-     * c.HTML(http.StatusOK, "index.html", gin.H{"title": "我是测试", "ce": "123456"})
-     *
-     * @return void
-     */
-    public function HTML($file, $params = [])
-    {
-        \extract($params);
-        \ob_start();
-        try {
-            // include PS_APP_PATH.'/View/'.$file_name.".php";
-            include $file;
-            // ob_flush();
-        } catch (\Throwable $e) {
-            echo $e;
-        }
-        return \ob_get_clean();
     }
 
     /**

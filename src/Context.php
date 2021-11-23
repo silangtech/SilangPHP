@@ -32,6 +32,56 @@ Class Context
     }
 
     /**
+     * 获取用户IP
+     */
+    public function ClientIP()
+    {
+        if(isset($this->request->header['x-real-ip']))
+        {
+            return $this->request->header['x-real-ip'];
+        }
+        if( isset($this->request->header['x-forwarded-for']) )
+        {
+            $arr = explode(',', $this->request->header['x-forwarded-for']);
+            foreach ($arr as $ip)
+            {
+                $ip = trim($ip);
+                if ($ip != 'unknown' ) {
+                    $client_ip = $ip; break;
+                }
+            }
+        }
+        else
+        {
+            $client_ip = isset($this->request->server['remote_addr']) ? $this->request->server['remote_addr'] : '';
+        }
+        preg_match("/[\d\.]{7,15}/", $client_ip, $onlineip);
+        $client_ip = ! empty($onlineip[0]) ? $onlineip[0] : '0.0.0.0';
+        return $client_ip;
+    }
+
+    /**
+     * c.HTML(http.StatusOK, "index.html", gin.H{"title": "我是测试", "ce": "123456"})
+     *
+     * @return void
+     */
+    public function HTML($httpcode = 200, $file = '', $params = [])
+    {
+        $this->response->withStatus($httpcode, '');
+        \extract($params);
+        \ob_start();
+        try {
+            // include PS_APP_PATH.'/View/'.$file_name.".php";
+            include $file;
+            // ob_flush();
+        } catch (\Throwable $e) {
+            echo $e;
+        }
+        $data = \ob_get_clean();
+        $this->response->end($data); 
+    }
+
+    /**
      * json格式化
      */
     public function JSON($httpcode = 200, $data = [])

@@ -183,6 +183,7 @@ class Response
         }
         $this->status = $code;
         $this->reasonPhrase = $reasonPhrase;
+        http_response_code($code);
     }
 
     public function getReasonPhrase()

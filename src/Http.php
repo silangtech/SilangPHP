@@ -25,8 +25,6 @@ Class Http
     public $count = 2;
     public $daemonize = 1;
     public $debug = 1;
-    public $request;
-    public $response;
     public $max_request = 10000;
     public $logger = null;
     public $tmp = '';
@@ -85,19 +83,19 @@ Class Http
 
     public function fpm()
     {
-        $this->request = new \SilangPHP\request();
-        $this->response = new \SilangPHP\response();
+        $request = new \SilangPHP\request();
+        $response = new \SilangPHP\response();
         $method = $_SERVER['REQUEST_METHOD'];
         if(!empty($pathInfo)){
-            $path= $pathInfo;
+            $path = $pathInfo;
         }elseif(!empty($_SERVER['PATH_INFO'])){
-            $path= $_SERVER["PATH_INFO"];
+            $path = $_SERVER["PATH_INFO"];
         }elseif(!empty($_SERVER['REQUEST_URI'])){
-            $path= $_SERVER["REQUEST_URI"];
+            $path = $_SERVER["REQUEST_URI"];
         }
-        $ctx = new Context($this->request, $this->response);
+        $ctx = new Context($request, $response);
         $res = \SilangPHP\Route::start($path, $method, $ctx);
-        return $this->response->end($res);
+        return $res;
     }
 
     public function workerman($action = 'start')
@@ -141,7 +139,6 @@ Class Http
                 public function __construct($connection)
                 {
                     $this->connection = $connection;
-                    $res = new WorkResponse($this->status, $this->header, '');
                 }
 
                 public function redirect($url, $code = 302)

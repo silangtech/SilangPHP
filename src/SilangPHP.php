@@ -371,10 +371,8 @@ _________.__.__                       __________  ___ _____________
      * 获取控制器
      * @param $cmd
      */
-    public static function getAction($cmd)
-    {
-        if(strpos($cmd, '/') != false)
-        {
+    public static function getAction($cmd = ''){
+        if(strpos($cmd, '/') != false){
             $cmd = trim($cmd, "/");
             $cmd = explode("/", $cmd);
         }elseif(strpos($cmd, '@') != false){
@@ -392,18 +390,16 @@ _________.__.__                       __________  ___ _____________
      * @param $cmd
      * @return array
      */
-    public static function getOpt($cmd = '')
-    {
-        if(empty($cmd))
-        {
+    public static function getOpt($cmd = ''){
+        if(empty($cmd)){
             return [];
         }
         $cmd = trim($cmd);
-        $args = explode("&",$cmd);
+        $args = explode("&", $cmd);
         $argv = [];
         foreach($args as $val)
         {
-            $tmp = explode("=",$val);
+            $tmp = explode("=", $val);
             if(isset($tmp[1]))
             {
                 $argv[$tmp[0]] = $tmp[1];
@@ -477,7 +473,7 @@ _________.__.__                       __________  ___ _____________
      * @param array $parameters
      * @return mixed
      */
-    public function makeDi($abstract, $parameters=[]){
+    public function makeDi($abstract, $parameters = []){
         if(!isset(self::$container[$abstract]))
         {
             if(class_exists($abstract)) {
@@ -527,7 +523,7 @@ _________.__.__                       __________  ___ _____________
     /**
      * 运行程序
      */
-    public static function run($port = '8080', $config = [])
+    public static function run($port = '8080', $action = 'start', $config = [])
     {
         date_default_timezone_set('Asia/Shanghai');
         self::$app = new Http($config);
@@ -536,20 +532,15 @@ _________.__.__                       __________  ___ _____________
             self::$app->port = $port;
             try{
                 // 运行程序 
-                $result = self::$app->run();
+                $result = self::$app->run($action);
             }catch(\Exception $e)
             {
                 $result = $e->getMessage();
-                self::$app->logger->error("run:".$result);
-                if(is_null(json_decode($result)) && (self::$app->debug == 0) )
-                {
-                    $result = 'error:4044';
-                }
-                echo $result.PHP_EOL;
-                return false;
+                return $result;
             }
             // 只有fpm才有结果输出
             echo $result;
+            return $result;
         }else{
             echo 'no engine';
         }

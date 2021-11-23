@@ -30,4 +30,38 @@ Class Context
         $this->response = $response;
         $this->id = $id;
     }
+
+    /**
+     * json格式化
+     */
+    public function JSON($httpcode = 200, $data = [])
+    {
+        
+    }
+
+    /**
+     * 输出string
+     */
+    public function String($httpcode = 200, $str = '')
+    {
+
+    }
+
+    /**
+     * 输出XML
+     */
+    public function XML($httpcode = 200, $data = [])
+    {
+
+    }
+
+    /**
+     * 输出yaml
+     */
+    public function YAML($httpcode = 200, $data = [])
+    {
+
+    }
+
+
 }

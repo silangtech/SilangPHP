@@ -92,17 +92,19 @@ class Route
 
     public static function next(Context $c)
     {
+        $res = '';
         $nextcount = count($c->handler);
         if($nextcount > 0)
         {
             $handler = array_shift($c->handler);
             if($nextcount !=1 )
             {
-                self::hander($handler, ['c' => $c]);
+                $res = self::hander($handler, ['c' => $c]);
             }else{
-                self::hander($handler, $c->vars);
+                $res = self::hander($handler, $c->vars);
             }
         }
+        return $res;
     }
 
     /**
@@ -144,13 +146,20 @@ class Route
                     if(is_array($handler))
                     {
                         $c->handler = $handler;
-                        $handler = array_shift($c->handler);
-                        self::hander($handler, $middlewaresParams);
+                        if(count($c->handler) == 1)
+                        {
+                            $handler = array_shift($c->handler);
+                            $res = self::hander($handler, $vars);
+                        }else{
+                            $handler = array_shift($c->handler);
+                            $res = self::hander($handler, $middlewaresParams);
+                        }
                     }else{
-                        self::hander($handler, $vars);
+                        $res = self::hander($handler, $vars);
                     }
                     break;
             }
+            return $res;
         }
     }
 
@@ -158,6 +167,7 @@ class Route
     {
         if(!is_callable($handler))
         {
+            $res = '404';
             // 一般是中间件,不允许同时多个handler
             if(class_exists($handler))
             {

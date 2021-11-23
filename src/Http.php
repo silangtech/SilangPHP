@@ -65,7 +65,7 @@ Class Http
      *
      * @return void
      */
-    public function run()
+    public function run($action)
     {
         switch(SilangPHP::$http)
         {
@@ -74,10 +74,10 @@ Class Http
                 $res = $this->fpm();
                 break;
             case 2:
-                $res = $this->workerman();
+                $res = $this->workerman($action);
                 break;
             case 3:
-                $res = $this->swoole();
+                $res = $this->swoole($action);
                 break;
         }
         return $res;
@@ -100,7 +100,7 @@ Class Http
         return $this->response->end($res);
     }
 
-    public function workerman()
+    public function workerman($action = 'start')
     {
         //每次运行框架的日期
         $nowdate = date("Ymd", time());
@@ -135,60 +135,41 @@ Class Http
 
             $response->hander = new class($connection) {
                 public $connection;
+                public $status = 200;
+                public $reason = '';
+                public $header = [];
                 public function __construct($connection)
                 {
                     $this->connection = $connection;
+                    $res = new WorkResponse($this->status, $this->header, '');
+                }
+
+                public function redirect($url, $code = 302)
+                {
+                    $this->connection->send(new WorkResponse($code, ['Location' => $url]));
+                }
+
+                public function status($code, $reason)
+                {
+                    $this->status = $code;
+                    $this->reason = $reason;
+                }
+
+                public function header($key, $val)
+                {
+                    $this->header[$key] = $val;
                 }
                 
                 public function write($data)
                 {
-                    $res = new WorkResponse(200, [], $data);
-                    $this->connection->send($res);
-                }
-            
-                public function send($data)
-                {
-                    $res = new WorkResponse(200, [], $data);
+                    $res = new WorkResponse($this->code, $this->header, $data);
                     $this->connection->send($res);
                 }
             
                 public function end($data)
                 {
-                    $res = new WorkResponse(200, [], $data);
+                    $res = new WorkResponse($this->code, $this->header, $data);
                     $this->connection->send($res);
-                }
-            
-                /**
-                 * @param int $status
-                 * @param array $headers
-                 * @param string $body
-                 * @return Response
-                 */
-                function response($body = '', $status = 200, $headers = array())
-                {
-                    return new WorkResponse($status, $headers, $body);
-                }
-            
-                /**
-                 * @param $data
-                 * @param int $options
-                 * @return Response
-                 */
-                function json($data, $options = JSON_UNESCAPED_UNICODE)
-                {
-                    return new WorkResponse(200, ['Content-Type' => 'application/json'], json_encode($data, $options));
-                }
-            
-                /**
-                 * @param $xml
-                 * @return Response
-                 */
-                function xml($xml)
-                {
-                    if ($xml instanceof \SimpleXMLElement) {
-                        $xml = $xml->asXML();
-                    }
-                    return new WorkResponse(200, ['Content-Type' => 'text/xml'], $xml);
                 }
             };
             $ctx = new Context($request, $response, $connection->id);

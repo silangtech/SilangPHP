@@ -91,6 +91,16 @@ Class Context
         $this->response->end($data);
     }
 
+    public function success($message = '', $data = [])
+    {
+        return $this->JSON(200, ['code' => 0, 'message' => $message, 'data' => $data]);
+    }
+
+    public function fail($code = -1, $message = '', $data = [])
+    {
+        return $this->JSON(200, ['code' => $code, 'message' => $message, 'data' => $data]);
+    }
+
     /**
      * 输出string
      */

@@ -25,7 +25,7 @@ Class Context
     public $hander;
     public $vars;
 
-    public function __construct($request, $response, $id = ''){
+    public function __construct(\SilangPHP\Request $request, \SilangPHP\Response $response, $id = ''){
         $this->request = $request;
         $this->response = $response;
         $this->id = $id;
@@ -36,7 +36,9 @@ Class Context
      */
     public function JSON($httpcode = 200, $data = [])
     {
-        
+        $this->response->withStatus($httpcode, '');
+        $data = json_encode($data, \JSON_UNESCAPED_UNICODE);
+        $this->response->end($data);
     }
 
     /**
@@ -44,7 +46,8 @@ Class Context
      */
     public function String($httpcode = 200, $str = '')
     {
-
+        $this->response->withStatus($httpcode, '');
+        $this->response->end($str);
     }
 
     /**

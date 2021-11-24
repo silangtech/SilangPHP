@@ -116,25 +116,35 @@ class Route
     public static function start($uri = '', $method = 'GET', Context $c = null)
     {
         $uri = parse_url($uri, PHP_URL_PATH);
-        $dispatcher = \FastRoute\simpleDispatcher(function (RouteCollector $r) {
-            foreach (self::$routes as $route) {
-                $r->addRoute($route['method'], $route['route'], $route['handler']);
+        $dispatcher = false;
+        try{
+            $dispatcher = \FastRoute\simpleDispatcher(function (RouteCollector $r) {
+                foreach (self::$routes as $route) {
+                    $r->addRoute($route['method'], $route['route'], $route['handler']);
+                }
+            });
+            if (false !== $pos = strpos($uri, '?')) {
+                $uri = substr($uri, 0, $pos);
             }
-        });
-        if (false !== $pos = strpos($uri, '?')) {
-            $uri = substr($uri, 0, $pos);
+        }catch(\Exception $e){
+            echo $e->getMessage();
         }
+        
         $uri = rawurldecode($uri);
         if($dispatcher)
         {
             $routeInfo = $dispatcher->dispatch($method, $uri);
             switch ($routeInfo[0]) {
                 case \FastRoute\Dispatcher::NOT_FOUND:
-                    return '404 NOT_FOUND';
+                    // return '404 NOT_FOUND';
+                    $c->response->withStatus(404);
+                    $c->response->end('404');
                     break;
                 case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
                     $allowedMethods = $routeInfo[1][0];
-                    return 'METHOD_NOT_ALLOWED|'.$allowedMethods;
+                    // return 'METHOD_NOT_ALLOWED';
+                    $c->response->withStatus(405);
+                    $c->response->end('METHOD_NOT_ALLOWED');
                     break;
                 case \FastRoute\Dispatcher::FOUND:
                     $handler = $routeInfo[1];

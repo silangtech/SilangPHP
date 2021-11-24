@@ -33,9 +33,9 @@ addGroup(前缀，Callable, middleware);
 ```
 # 控制器示例
 ```PHP
-Class IndexController{
+Class index{
     // 一定要加$c参数，主要返回相关的context
-    public function Index($c)
+    public function index($c)
     {
         
     }
@@ -44,11 +44,13 @@ Class IndexController{
 
 # request和response
 ```PHP
-public function Index($c)
+public function index($c)
 {
     $c->reqeust->item('test', '');
     $c->reqeust->get('test', '');
-    $c->response->json(0, 'test', '1234');
+    $c->reqeust->post('test', '');
+    $c->JSON(200, ['array' => 'test']);
+    $c->String(200, '哈哈');
 }
 ```
 
@@ -88,7 +90,12 @@ require_once(PS_ROOT_PATH."/vendor/autoload.php");
 # 其它小方法
 ## HTML模板引擎
 ```PHP
-\SilangPHP\SilangPHP::HTML('/web/index.php', $params);
+public function index($c)
+{
+    $params = ['title' => '首页标题', 'body' => '这是一篇文章'];
+    $c->HTML(200, '/web/index.php', $params);
+}
+
 ```
 
 ## 临时缓存
@@ -96,3 +103,12 @@ require_once(PS_ROOT_PATH."/vendor/autoload.php");
 \SilangPHP\SilangPHP::setCache('key', 'test');
 \SilangPHP\SilangPHP::getCache('key');
 ```
+ 
+## 动态生成路由配置
+```PHP
+$data = scandir($path);
+// scan之后，把controll读取生成Route配置
+// 处理control文件略过
+echo "Route::addRoute('POST', '/api/{$classname}/{$funcname}{$vars}', 'mg\\\\http\\\\api\\\\controller\\\\{$classname}@{$funcname}');".PHP_EOL;
+```
+

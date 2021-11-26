@@ -20,6 +20,7 @@ Class Config
     //框架配置文件
     public $config = [];
     public $envconfig = [];
+    public $configdir;
     static private $instance;
     static public function instance()
     {
@@ -27,6 +28,14 @@ Class Config
             self::$instance = new self();
         }
         return self::$instance;
+    }
+
+    /**
+     * 设置配置文件目录
+     */
+    public static function setConfigDir(string $path = '')
+    {
+        self::$configdir = $path;
     }
 
     /**

@@ -44,6 +44,7 @@ _________.__.__                       __________  ___ _____________
     public static $output;
     public static $user = 'www-data';
     public static $http = 1;
+    public static $debug = 1;
 
     /**
      * 输出
@@ -155,7 +156,7 @@ _________.__.__                       __________  ___ _____________
      */
     public static function handler_debug_error($errno, $errmsg, $filename, $linenum, $vars = [])
     {
-        if(\SilangPHP\SilangPHP::$app->debug == 1)
+        if(\SilangPHP\SilangPHP::$debug == 1)
         {
             // 这里直接输出了
             $err = self::debug_format_errmsg('debug', $errno, $errmsg, $filename, $linenum, $vars);
@@ -454,13 +455,20 @@ _________.__.__                       __________  ___ _____________
         return call_user_func_array(self::$container[$abstract], $parameters);
     }
 
-    /**
-     * 设置目录(废弃的方法)
-     * @param [type] $path
-     * @return void
-     */
-    public static function setAppDir(string $path = '')
+    public static function engine(array $path = [])
     {
+        if(isset($path['root']))
+        {
+            define('PS_ROOT_PATH', $path['root']);
+        }
+        if(isset($path['config']))
+        {
+            define('PS_CONFIG_PATH', PS_ROOT_PATH."/".$path['config']."/");
+        }
+        if(isset($path['tmp']))
+        {
+            define('PS_RUNTIME_PATH', PS_ROOT_PATH."/".$path['tmp']."/");
+        }
         return true;
     }
 

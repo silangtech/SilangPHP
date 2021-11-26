@@ -24,7 +24,6 @@ Class Http
     public $port = 8080;
     public $count = 2;
     public $daemonize = 1;
-    public $debug = 1;
     public $max_request = 10000;
     public $logger = null;
     public $tmp = '';
@@ -35,7 +34,6 @@ Class Http
         $this->port = $config['port'] ?? $this->port;
         $this->count = $config['count'] ?? $this->count;
         $this->daemonize = $config['daemonize'] ?? $this->daemonize;
-        $this->debug = $config['debug'] ?? $this->debug;
         $this->tmp = $tmp;
         if(defined(PS_RUNTIME_PATH))
         {
@@ -43,13 +41,9 @@ Class Http
         }
     }
 
-    public function initialize($constraint = 0)
+    public function initialize()
     {
-        if($constraint == 1)
-        {
-            $this->debug = 1;
-        }
-        if($this->debug == '1')
+        if(SilangPHP::$debug == '1')
         {
             error_reporting(E_ALL);
             SilangPHP::register();

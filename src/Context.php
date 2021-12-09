@@ -32,6 +32,27 @@ Class Context
     }
 
     /**
+     * 中间件方法
+     * $res = \SilangPHP\Route::next($c);
+     */
+    public function next()
+    {
+        $res = '';
+        $nextcount = count($this->handler);
+        if($nextcount > 0)
+        {
+            $handler = array_shift($this->handler);
+            if($nextcount !=1 )
+            {
+                $res = \SilangPHP\Route::hander($handler, ['c' => $this]);
+            }else{
+                $res = \SilangPHP\Route::hander($handler, $this->vars);
+            }
+        }
+        return $res;
+    }
+
+    /**
      * 获取用户IP
      */
     public function ClientIP()

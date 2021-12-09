@@ -77,8 +77,8 @@ Class Http
 
     public function fpm()
     {
-        $request = new \SilangPHP\request();
-        $response = new \SilangPHP\response();
+        $request = new \SilangPHP\Request();
+        $response = new \SilangPHP\Response();
         $method = $_SERVER['REQUEST_METHOD'];
         if(!empty($pathInfo)){
             $path = $pathInfo;

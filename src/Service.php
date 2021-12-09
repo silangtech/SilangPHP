@@ -73,20 +73,34 @@ class Service extends \Swoole\Server
     {
         // 事件
         $this->on('Start', array($this, 'onStart'));
-        $this->on('Shutdown', array($this, 'onShutdown'));
+        if(method_exists($this, 'onShutdown')){
+            $this->on('Shutdown', array($this, 'onShutdown'));
+        }
 
         $this->on('WorkerStart', array($this, 'onWorkerStart'));
-        $this->on('WorkerError', array($this, 'onWorkerError'));
-        $this->on('WorkerStop', array($this, 'onWorkerStop'));
+        if(method_exists($this, 'onWorkerError')){
+            $this->on('WorkerError', array($this, 'onWorkerError'));
+        }
+        if(method_exists($this, 'onWorkerStop')){
+
+            $this->on('WorkerStop', array($this, 'onWorkerStop'));
+        }
 
         $this->on('ManagerStart', array($this, 'onManagerStart'));
-        $this->on('ManagerStop', array($this, 'onManagerStop'));
+        if(method_exists($this, 'onManagerStop')){
+            $this->on('ManagerStop', array($this, 'onManagerStop'));
+        }
 
         $this->on('Task', array($this, 'onTask'));
-        $this->on('Finish', array($this, 'onFinish'));
-        $this->on('Close', array($this, 'onClose'));
-
-        $this->on('Connect', array($this, 'onConnect'));
+        if(method_exists($this, 'onFinish')){
+            $this->on('Finish', array($this, 'onFinish'));
+        }
+        if(method_exists($this, 'onClose')){
+            $this->on('Close', array($this, 'onClose'));
+        }
+        if(method_exists($this, 'onConnect')){
+            $this->on('Connect', array($this, 'onConnect'));
+        }
         $this->on('Receive', array($this, 'onReceive'));
 
     }

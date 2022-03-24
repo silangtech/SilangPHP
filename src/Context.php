@@ -22,7 +22,7 @@ Class Context
     public $request;
     public $response;
     public $route;
-    public $hander;
+    public $handler;
     public $vars;
 
     public function __construct(\SilangPHP\Request $request, \SilangPHP\Response $response, $id = ''){

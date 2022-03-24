@@ -26,7 +26,7 @@ addGroup(前缀，Callable, middleware);
 ```PHP
 \SilangPHP\Route::use(funciton($c){
     // 逻辑前
-    \SilangPHP\Route::next($c);
+    $c->next();
     // 逻辑后
 });
 

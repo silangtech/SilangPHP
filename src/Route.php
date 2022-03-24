@@ -28,6 +28,8 @@ class Route
     public static $vars = [];
     public static $handler = [];
     public static $prefix = '';
+    public static $dispatcher = null;
+
     public static function use(...$handler)
     {
         self::$middlewares = array_merge(self::$middlewares, $handler);
@@ -89,23 +91,6 @@ class Route
         self::$routes = array_merge(self::$routes, [$routes]);
     }
 
-    public static function next(Context $c)
-    {
-        $res = '';
-        $nextcount = count($c->handler);
-        if($nextcount > 0)
-        {
-            $handler = array_shift($c->handler);
-            if($nextcount !=1 )
-            {
-                $res = self::hander($handler, ['c' => $c]);
-            }else{
-                $res = self::hander($handler, $c->vars);
-            }
-        }
-        return $res;
-    }
-
     /**
      * 路由开始
      * @param string $pathInfo
@@ -115,25 +100,26 @@ class Route
     public static function start($uri = '', $method = 'GET', Context $c = null)
     {
         $uri = parse_url($uri, PHP_URL_PATH);
-        $dispatcher = false;
         try{
-            $dispatcher = \FastRoute\simpleDispatcher(function (RouteCollector $r) {
-                foreach (self::$routes as $route) {
-                    $r->addRoute($route['method'], $route['route'], $route['handler']);
-                }
-            });
-            if (false !== $pos = strpos($uri, '?')) {
+            if(empty(self::$dispatcher)){
+                self::$dispatcher = \FastRoute\simpleDispatcher(function (RouteCollector $r) {
+                    foreach (self::$routes as $route) {
+                        $r->addRoute($route['method'], $route['route'], $route['handler']);
+                    }
+                });
+            }
+            $pos = strpos($uri, '?');
+            if (false !== $pos) {
                 $uri = substr($uri, 0, $pos);
             }
         }catch(\Exception $e){
             echo $e->getMessage();
         }
-        
         $uri = rawurldecode($uri);
-        if($dispatcher)
+        if(self::$dispatcher)
         {
             $res = '';
-            $routeInfo = $dispatcher->dispatch($method, $uri);
+            $routeInfo = self::$dispatcher->dispatch($method, $uri);
             switch ($routeInfo[0]) {
                 case \FastRoute\Dispatcher::NOT_FOUND:
                     // return '404 NOT_FOUND';

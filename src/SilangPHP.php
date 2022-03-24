@@ -21,7 +21,7 @@ namespace SilangPHP;
  */
 final Class SilangPHP
 {
-    const VERSION = '2.0.1';
+    const VERSION = '2.0.2';
     public static $app;
     public static $input = '';
     public static $user = 'www-data';

@@ -46,9 +46,9 @@ Class index{
 ```PHP
 public function index($c)
 {
-    $c->reqeust->item('test', '');
-    $c->reqeust->get('test', '');
-    $c->reqeust->post('test', '');
+    $c->request->item('test', '');
+    $c->request->get('test', '');
+    $c->request->post('test', '');
     $c->JSON(200, ['array' => 'test']);
     $c->String(200, '哈哈');
 }
@@ -112,3 +112,13 @@ $data = scandir($path);
 echo "Route::addRoute('POST', '/api/{$classname}/{$funcname}{$vars}', 'mg\\\\http\\\\api\\\\controller\\\\{$classname}@{$funcname}');".PHP_EOL;
 ```
 
+## workerman守护进程模式
+```PHP
+require_once("../vendor/autoload.php");
+\App\Router::initialize();
+\SilangPHP\SilangPHP::engine(dirname(dirname(__FILE__)));
+\SilangPHP\SilangPHP::$http = 2;
+\SilangPHP\SilangPHP::run("8081");
+```
+
+切记：使用这模式需要一定的代码逻辑全面性！！

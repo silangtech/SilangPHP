@@ -85,7 +85,6 @@ class Route
             $middlewares_tmp = array_merge($middlewares_tmp, $middlewares);
         }
         $handler = array_merge($middlewares_tmp, [$handler]);
-        // var_dump($handler);exit();
         $routes = ['method' => $httpMethod, 'route' => self::$prefix.$route, 'handler' => $handler];
         self::$routes = array_merge(self::$routes, [$routes]);
     }
@@ -133,6 +132,7 @@ class Route
         $uri = rawurldecode($uri);
         if($dispatcher)
         {
+            $res = '';
             $routeInfo = $dispatcher->dispatch($method, $uri);
             switch ($routeInfo[0]) {
                 case \FastRoute\Dispatcher::NOT_FOUND:

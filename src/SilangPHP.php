@@ -21,135 +21,12 @@ namespace SilangPHP;
  */
 final Class SilangPHP
 {
-    private static $welcome = '
-_________.__.__                       __________  ___ _____________ 
-/   _____/|__|  | _____    ____    ____\______   \/   |   \______   \
-\_____  \ |  |  | \__  \  /    \  / ___\|     ___/    ~    \     ___/
-/        \|  |  |__/ __ \|   |  \/ /_/  >    |   \    Y    /    |    
-/_______  /|__|____(____  /___|  /\___  /|____|    \___|_  /|____|    
-        \/              \/     \//_____/                 \/           
-';
-
-    const VERSION = '2.0.0';
+    const VERSION = '2.0.1';
     public static $app;
-    // 默认运行模式
-    public static $cache = [];
-    public static $devlog = 0;
-    protected static $dbpool;
-    protected static $container = false;
-    private static $stack = [];
-    private static $top = -1;
-    public static $action = [];
     public static $input = '';
-    public static $output;
     public static $user = 'www-data';
     public static $http = 1;
     public static $debug = 1;
-
-    /**
-     * 输出
-     *
-     * @return void
-     */
-    public static function print(string $content = '')
-    {
-        echo PHP_EOL."\033[34m ".$content." \033[0m".PHP_EOL;
-    }
-    
-    /**
-     * 入栈
-     */
-    public static function push($data)
-    {
-        self::$top = ++self::$top;
-        self::$stack[self::$top] = $data;
-    }
-    /**
-     * 出栈
-     */
-    public static function pop()
-    {
-        if(self::$top == -1){
-            return false;
-        }
-        $tmp = self::$stack[self::$top];
-        self::$top = --self::$top;
-        return $tmp;
-
-    }
-    
-    public static function create($size = 20, $middle = null)
-    {
-        // 生成池中内容
-        for ($i = 0; $i < $size; $i++)
-        {
-            if($middle)
-            {
-                self::put($middle);
-            }
-        }
-    }
-
-    /**
-     * 添加
-     * @param $middle
-     */
-    public static function put($middle)
-    {
-        static::$dbpool->push($middle);
-    }
-
-    /**
-     * 获取
-     * @return bool|mixed
-     */
-    public static function get()
-    {
-        return static::$dbpool->pop();
-    }
-
-    /**
-     * 获取临时缓存
-     */
-    public static function setCache($key)
-    {
-        return self::$cache[$key] ?? '';
-    }
-
-    /**
-     * 设置临时缓存
-     */
-    public static function getCache($key, $value)
-    {
-        self::$cache[$key] = $value;
-    }
-
-    public static $_debug_errortype = array (
-        E_WARNING         => "警告",
-        E_NOTICE          => "普通警告",
-        E_USER_ERROR      => "用户错误",
-        E_USER_WARNING    => "用户警告",
-        E_USER_NOTICE     => "用户提示",
-        E_STRICT          => "运行时错误",
-        E_ERROR           => "致命错误",
-        E_PARSE           => "解析错误",
-        E_CORE_ERROR      => "核心致命错误",
-        E_CORE_WARNING    => "核心警告",
-        E_COMPILE_ERROR   => "编译致命错误",
-        E_COMPILE_WARNING => "编译警告"
-    );
-
-    private static $_debug_error_msg;
-
-    /**
-     * 获取加载的文件
-     * @return string[]
-     */
-    public static function get_include_file()
-    {
-        $files = get_included_files();
-        return $files;
-    }
 
     /**
      * 错误接管函数
@@ -159,11 +36,7 @@ _________.__.__                       __________  ___ _____________
         if(\SilangPHP\SilangPHP::$debug == 1)
         {
             // 这里直接输出了
-            $err = self::debug_format_errmsg('debug', $errno, $errmsg, $filename, $linenum, $vars);
-            if( $err != '@' )
-            {
-                self::$_debug_error_msg .= $err;
-            }
+            self::debug_format_errmsg('debug', $errno, $errmsg, $filename, $linenum, $vars);
         }
     }
 
@@ -233,14 +106,7 @@ _________.__.__                       __________  ___ _____________
         }
         else
         {
-            if( !empty($_SERVER['REQUEST_URI']) )
-            {
-                $scriptName = $_SERVER['REQUEST_URI'];
-                $nowurl = $scriptName;
-            } else {
-                $scriptName = $_SERVER['PHP_SELF'];
-                $nowurl = empty($_SERVER['QUERY_STRING']) ? $scriptName : $scriptName.'?'.$_SERVER['QUERY_STRING'];
-            }
+            $nowurl = '';
             //替换不安全字符
             $f_arr_s = array('<', '*', '#', '"', "'", "\\", '(');
             $f_arr_r = array('〈', '×', '＃', '“', "‘", "＼", '（');
@@ -249,14 +115,10 @@ _________.__.__                       __________  ___ _____________
             $nowtime = date('Y-m-d H:i:s');
             $err = "Time: ".$nowtime.' @URL: '.$nowurl."\n";
         }
-        if( empty(self::$_debug_errortype[$errno]) )
-        {
-            self::$_debug_errortype[$errno] = "<font color='#466820'>手动抛出</font>";
-        }
         $error_line = htmlspecialchars($error_line);
         $err .= "<strong>SilangPHP框架应用错误跟踪：</strong><br />\n";
         $err .= "发生环境：" . date("Y-m-d H:i:s", time()).'::' . "<br />\n";
-        $err .= "错误类型：" . self::$_debug_errortype[$errno] . "<br />\n";
+        $err .= "错误类型：" . $errno . "<br />\n";
         $err .= "出错原因：<font color='#3F7640'>" . $errmsg . "</font><br />\n";
         $err .= "提示位置：" . $filename . " 第 {$linenum} 行<br />\n";
         $err .= "断点源码：<font color='#747267'>{$error_line}</font><br />\n";
@@ -303,7 +165,16 @@ _________.__.__                       __________  ___ _____________
     public static function runCmd($action = '', $input = '', $usergroup = [])
     {
         self::changeUser($usergroup);
-        self::print(self::$welcome);
+        $welcome = '
+_________.__.__                       __________  ___ _____________ 
+/   _____/|__|  | _____    ____    ____\______   \/   |   \______   \
+\_____  \ |  |  | \__  \  /    \  / ___\|     ___/    ~    \     ___/
+/        \|  |  |__/ __ \|   |  \/ /_/  >    |   \    Y    /    |    
+/_______  /|__|____(____  /___|  /\___  /|____|    \___|_  /|____|    
+        \/              \/     \//_____/                 \/           
+';
+        echo PHP_EOL."\033[34m ".$welcome." \033[0m".PHP_EOL;
+        echo PHP_EOL."\033[34m -------".self::VERSION."------- \033[0m".PHP_EOL;
         $action = self::getAction($action);
         if($input)
         {
@@ -336,15 +207,9 @@ _________.__.__                       __________  ___ _____________
      * @param $cmd
      */
     public static function getAction($cmd = ''){
-        if(strpos($cmd, '/') != false){
-            $cmd = trim($cmd, "/");
-            $cmd = explode("/", $cmd);
-        }elseif(strpos($cmd, '@') != false){
+        if(strpos($cmd, '@') != false){
             $cmd = trim($cmd, "@");
             $cmd = explode("@", $cmd);
-        }else{
-            $cmd = trim($cmd, ":");
-            $cmd = explode(":", $cmd);
         }
         return $cmd;
     }
@@ -395,79 +260,30 @@ _________.__.__                       __________  ___ _____________
         }
     }
 
-    
-    /**
-     * 容器的绑定
-     * @param $abstract
-     * @param $concrete
-     */
-    public static function setDi(String $abstract, $concrete){
-        self::$container[$abstract] = $concrete;
-    }
-
-    /**
-     * 直接获取容器
-     * @param $abstract
-     * @return mixed|string
-     */
-    public static function getDi($abstract)
+    public static function engine(string $pathroot = '')
     {
-        return self::$container[$abstract] ?? null;
-    }
-
-    /**
-     *  判断是否有存在
-     *
-     * @param [type] $abstract
-     * @return boolean
-     */
-    public static function hasDi($abstract)
-    {
-        if(isset(self::$container[$abstract]))
-        {
-            return true;
-        }else{
-            return false;
+        if(empty($pathroot)){
+            die('请设置项目路径');
         }
-    }
-
-    /**
-     * 容器调用
-     * @param $abstract
-     * @param array $parameters
-     * @return mixed
-     */
-    public function makeDi($abstract, $parameters = []){
-        if(!isset(self::$container[$abstract]))
-        {
-            if(class_exists($abstract)) {
-                $tmp =  new $abstract(...$parameters);
-                self::$container[$abstract] = $tmp;
-                return $tmp;
-            } else {
-                return '';
-            }
+        if(!empty($pathroot)){
+            $path = [
+                'root' => $pathroot,
+                'config' => $pathroot.'/config',
+                'tmp' => $pathroot.'/runtime',
+            ];
         }
-        if(empty($parameters))
-        {
-            return self::$container[$abstract];
-        }
-        return call_user_func_array(self::$container[$abstract], $parameters);
-    }
 
-    public static function engine(array $path = [])
-    {
         if(isset($path['root']))
         {
             define('PS_ROOT_PATH', $path['root']);
         }
         if(isset($path['config']))
         {
-            define('PS_CONFIG_PATH', PS_ROOT_PATH."/".$path['config']."/");
+            define('PS_CONFIG_PATH', $path['config']."/");
         }
         if(isset($path['tmp']))
         {
-            define('PS_RUNTIME_PATH', PS_ROOT_PATH."/".$path['tmp']."/");
+            define('PS_RUNTIME_PATH', $path['tmp']."/");
         }
         return true;
     }
@@ -479,22 +295,19 @@ _________.__.__                       __________  ___ _____________
     {
         date_default_timezone_set('Asia/Shanghai');
         self::$app = new Http($config);
-        if(is_object(self::$app))
+        self::$app->port = $port;
+        try{
+            // 运行程序 
+            $result = self::$app->run($action);
+        }catch(\Exception $e)
         {
-            self::$app->port = $port;
-            try{
-                // 运行程序 
-                $result = self::$app->run($action);
-            }catch(\Exception $e)
-            {
-                $result = $e->getMessage();
-                return $result;
-            }
-            // 只有fpm才有结果输出
-            echo $result;
+            $result = $e->getMessage();
             return $result;
-        }else{
-            echo 'no engine';
         }
+        // 只有fpm才有结果输出
+        if(self::$http == 1){
+            echo $result;
+        }
+        return $result;
     }
 }

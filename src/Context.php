@@ -130,22 +130,4 @@ Class Context
         $this->response->withStatus($httpcode, '');
         $this->response->end($str);
     }
-
-    /**
-     * 输出XML
-     */
-    public function XML($httpcode = 200, $data = [])
-    {
-
-    }
-
-    /**
-     * 输出yaml
-     */
-    public function YAML($httpcode = 200, $data = [])
-    {
-
-    }
-
-
 }

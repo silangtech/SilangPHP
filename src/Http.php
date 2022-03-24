@@ -24,7 +24,7 @@ Class Http
     public $port = 8080;
     public $count = 2;
     public $daemonize = 1;
-    public $max_request = 10000;
+    public $max_request = 1000000;
     public $logger = null;
     public $tmp = '';
 
@@ -35,7 +35,7 @@ Class Http
         $this->count = $config['count'] ?? $this->count;
         $this->daemonize = $config['daemonize'] ?? $this->daemonize;
         $this->tmp = $tmp;
-        if(defined(PS_RUNTIME_PATH))
+        if(defined("PS_RUNTIME_PATH"))
         {
             $this->tmp = PS_RUNTIME_PATH;
         }
@@ -96,10 +96,7 @@ Class Http
     {
         //每次运行框架的日期
         $nowdate = date("Ymd", time());
-        if(defined(PS_RUNTIME_PATH))
-        {
-            Worker::$stdoutFile = PS_RUNTIME_PATH."/log/warning".$nowdate.".log";
-        }
+        Worker::$stdoutFile = $this->tmp."warning".$nowdate.".log";
         $worker = new Worker("http://{$this->host}:{$this->port}");
         // php进程用户
         $worker->user = 'www-data';
@@ -153,13 +150,13 @@ Class Http
                 
                 public function write($data)
                 {
-                    $res = new WorkResponse($this->code, $this->header, $data);
+                    $res = new WorkResponse($this->status, $this->header, $data);
                     $this->connection->send($res);
                 }
             
                 public function end($data)
                 {
-                    $res = new WorkResponse($this->code, $this->header, $data);
+                    $res = new WorkResponse($this->status, $this->header, $data);
                     $this->connection->send($res);
                 }
             };

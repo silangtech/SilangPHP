@@ -56,6 +56,7 @@ class Request
             // $this->server = $_SERVER ?? [];
             $this->cookies = $_COOKIE ?? [];
             $this->request = $_REQUEST ?? [];
+            $this->files = $_FILES ?? [];
             $this->raw = file_get_contents("php://input") ?? '';
             $this->withMethod($_SERVER['REQUEST_METHOD']);
             $this->withUri($_SERVER["REQUEST_URI"]);

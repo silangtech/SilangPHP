@@ -142,6 +142,14 @@ class Service extends \Swoole\Server
         sleep(1);
         $this->run();
     }
+    
+    /**
+     * 任务完成时
+     * Warning: Swoole\Server::start(): require onFinish callback in /webwww/www/sdk/vendor/silangtech/silangphp/src/Service.php on line 115
+     */
+    public function onFinish(\Swoole\Server $serv, $task_id, $data){
+        echo $task_id.'_task_finish'.PHP_EOL;
+    } 
 
     /**
      * 开始进程

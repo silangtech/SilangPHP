@@ -128,6 +128,7 @@ class Route
                     break;
                 case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
                     $allowedMethods = $routeInfo[1][0];
+                    // var_dump($allowedMethods);
                     // return 'METHOD_NOT_ALLOWED';
                     $c->response->withStatus(405);
                     $c->response->end('METHOD_NOT_ALLOWED');
@@ -174,11 +175,32 @@ class Route
                 if(class_exists($control[0]))
                 {
                     $ins = new $control[0];
-                    $res = call_user_func_array(array($ins, $control[1]), $vars);
+                    $reflection = new \ReflectionMethod($ins, $control[1]);
+                    $n_vars = [];
+                    // 有参数的情况下才注入
+                    foreach($reflection->getParameters() AS $arg){
+                        $name_key = $arg->getName();
+                        if(array_key_exists($name_key, $vars)){
+                            $n_vars[$name_key] = $vars[$name_key];
+                        }
+                    }
+                    // $res = $reflection->invoke(...$n_vars);
+                    $res = call_user_func_array(array($ins, $control[1]), $n_vars);
                 }
             }
         }else{
-            $res = call_user_func_array($handler, $vars);
+            $refFunction = new \ReflectionFunction($handler);
+            $parameters = $refFunction->getParameters();
+            $n_vars = [];
+            if($parameters){
+                foreach($parameters as $parameter){
+                    $name_key = $parameter->getName();
+                    if(array_key_exists($name_key, $vars)){
+                        $n_vars[$name_key] = $vars[$name_key];
+                    }
+                }
+            }
+            $res = call_user_func_array($handler, $n_vars);
         }
         return $res;
     }

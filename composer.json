@@ -12,8 +12,7 @@
     ],
     "require": {
         "php": ">=7.1.0",
-        "nikic/fast-route": "v1.3.0",
-        "workerman/workerman": "4.0.18"
+        "nikic/fast-route": "v1.3.0"
     },
     "require-dev": {
         "zircote/swagger-php": "3.1.0",
